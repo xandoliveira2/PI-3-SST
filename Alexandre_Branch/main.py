@@ -2,8 +2,6 @@ import streamlit as st
 import pandas as pd
 import plotly.express as pe
 import pymongo as pm
-
-from geopy import Point
 def decimal_to_degree(formato: str):
     if 'S' in formato or 'W' in formato or 'N' in formato or 'E' in formato:
 
