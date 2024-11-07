@@ -221,5 +221,6 @@ def update_map(request):
     
   
     # return JsonResponse({'grafico_html':grafico_html})
-    return render(request, 'density_map.html',{'grafico_html':grafico_html})
+    return render(request, 'fetch.html',{'grafico_html':grafico_html})
+
 # Create your views here
