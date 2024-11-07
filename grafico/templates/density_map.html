@@ -130,16 +130,7 @@ fetch('requisicao').then(response => response.json()).then( //http://localhost:8
 {% block 'dashboard1' %}
    
 
-<script>
-    fetch('../mapa_fetch/?param1=15/10/2024&param2=00:00').then(response => response.text()).then(data => {
-    const parser = new DOMParser();
-    const doc = parser.parseFromString(data, 'text/html');
-
-    const targetDiv = doc.querySelector('#pegar_grafico');
-    const div_ext = document.getElementById('colocar_valor');
-    div_ext.innerHTML = targetDiv.innerHTML;
-    })
-</script>
+{{ grafico_html|safe }}
 
 
 
