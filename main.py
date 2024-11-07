@@ -2,120 +2,193 @@ import cv2
 import numpy as np
 from ultralytics import YOLO
 from collections import deque
+from pymongo import MongoClient
+from datetime import datetime, timedelta
 
-class CentroidTracker:
-    def __init__(self, maxDisappeared=50):
-        self.nextObjectID = 0
-        self.objects = {}
-        self.disappeared = {}
-        self.maxDisappeared = maxDisappeared
+def conectar_mongodb():
+    client = MongoClient("mongodb://localhost:27017/")
+    db = client['contagem_veiculos']
+    return db['dados_veiculos']
 
-    def register(self, centroid):
-        self.objects[self.nextObjectID] = centroid
-        self.disappeared[self.nextObjectID] = 0
-        self.nextObjectID += 1
+# Função para salvar dados no MongoDB
+def salvar_dados_mongodb(colecao, dados):
+    colecao.insert_one(dados)
 
-    def deregister(self, objectID):
-        del self.objects[objectID]
-        del self.disappeared[objectID]
+class RastreadorDeCentroides:
+    def __init__(self, max_desaparecidos=50):
+        self.proximo_id_objeto = 0
+        self.objetos = {}
+        self.desaparecidos = {}
+        self.max_desaparecidos = max_desaparecidos
 
-    def update(self, inputCentroids):
-        if len(inputCentroids) == 0:
-            for objectID in list(self.disappeared.keys()):
-                self.disappeared[objectID] += 1
-                if self.disappeared[objectID] > self.maxDisappeared:
-                    self.deregister(objectID)
-            return self.objects
+    def registrar(self, centroide):
+        self.objetos[self.proximo_id_objeto] = centroide
+        self.desaparecidos[self.proximo_id_objeto] = 0
+        self.proximo_id_objeto += 1
 
-        if len(self.objects) == 0:
-            for i in range(0, len(inputCentroids)):
-                self.register(inputCentroids[i])
+    def remover(self, id_objeto):
+        del self.objetos[id_objeto]
+        del self.desaparecidos[id_objeto]
+
+    def atualizar(self, centroides_entrada):
+        if len(centroides_entrada) == 0:
+            for id_objeto in list(self.desaparecidos.keys()):
+                self.desaparecidos[id_objeto] += 1
+                if self.desaparecidos[id_objeto] > self.max_desaparecidos:
+                    self.remover(id_objeto)
+            return self.objetos
+
+        if len(self.objetos) == 0:
+            for i in range(0, len(centroides_entrada)):
+                self.registrar(centroides_entrada[i])
         else:
-            objectIDs = list(self.objects.keys())
-            objectCentroids = list(self.objects.values())
+            ids_objetos = list(self.objetos.keys())
+            centroides_objetos = list(self.objetos.values())
 
-            D = self._euclidean_distances(objectCentroids, inputCentroids)
+            distancias = self._distancias_euclidianas(centroides_objetos, centroides_entrada)
 
-            rows = D.min(axis=1).argsort()
-            cols = D.argmin(axis=1)[rows]
+            linhas = distancias.min(axis=1).argsort()
+            colunas = distancias.argmin(axis=1)[linhas]
 
-            usedRows = set()
-            usedCols = set()
+            linhas_usadas = set()
+            colunas_usadas = set()
 
-            for (row, col) in zip(rows, cols):
-                if row in usedRows or col in usedCols:
+            for (linha, coluna) in zip(linhas, colunas):
+                if linha in linhas_usadas or coluna in colunas_usadas:
                     continue
 
-                objectID = objectIDs[row]
-                self.objects[objectID] = inputCentroids[col]
-                self.disappeared[objectID] = 0
+                id_objeto = ids_objetos[linha]
+                self.objetos[id_objeto] = centroides_entrada[coluna]
+                self.desaparecidos[id_objeto] = 0
 
-                usedRows.add(row)
-                usedCols.add(col)
+                linhas_usadas.add(linha)
+                colunas_usadas.add(coluna)
 
-            unusedRows = set(range(0, D.shape[0])).difference(usedRows)
-            unusedCols = set(range(0, D.shape[1])).difference(usedCols)
+            linhas_nao_usadas = set(range(0, distancias.shape[0])).difference(linhas_usadas)
+            colunas_nao_usadas = set(range(0, distancias.shape[1])).difference(colunas_usadas)
 
-            if D.shape[0] >= D.shape[1]:
-                for row in unusedRows:
-                    objectID = objectIDs[row]
-                    self.disappeared[objectID] += 1
+            if distancias.shape[0] >= distancias.shape[1]:
+                for linha in linhas_nao_usadas:
+                    id_objeto = ids_objetos[linha]
+                    self.desaparecidos[id_objeto] += 1
 
-                    if self.disappeared[objectID] > self.maxDisappeared:
-                        self.deregister(objectID)
+                    if self.desaparecidos[id_objeto] > self.max_desaparecidos:
+                        self.remover(id_objeto)
 
             else:
-                for col in unusedCols:
-                    self.register(inputCentroids[col])
+                for coluna in colunas_nao_usadas:
+                    self.registrar(centroides_entrada[coluna])
 
-        return self.objects
+        return self.objetos
 
-    def _euclidean_distances(self, ptsA, ptsB):
-        D = np.linalg.norm(np.array(ptsA)[:, np.newaxis] - np.array(ptsB), axis=2)
-        return D
+    def _distancias_euclidianas(self, ptsA, ptsB):
+        distancias = np.linalg.norm(np.array(ptsA)[:, np.newaxis] - np.array(ptsB), axis=2)
+        return distancias
 
-def process_video_yolov8(video_path):
-    model = YOLO('yolov8m.pt')
-    cap = cv2.VideoCapture(video_path)
-    total_cars = 0
-    tracker = CentroidTracker(maxDisappeared=50)
-    counted_ids = set()
-    confidence_threshold = 0.6
 
-    while cap.isOpened():
-        ret, frame = cap.read()
+def processar_video_yolov11(caminho_video):
+    modelo = YOLO('yolo11s.pt')
+    captura = cv2.VideoCapture(caminho_video)
+
+    total_carros = 0
+    total_motos = 0
+    rastreador_carros = RastreadorDeCentroides(max_desaparecidos=50)
+    rastreador_motos = RastreadorDeCentroides(max_desaparecidos=50)
+    ids_contados_carros = set()
+    ids_contados_motos = set()
+    limite_confianca = 0.4
+    colecao_veiculos = conectar_mongodb()
+
+    agora = datetime.now()
+    minutos_para_proxima_hora = (60 - agora.minute) % 60
+    inicio_contagem = agora + timedelta(minutes=minutos_para_proxima_hora)
+    inicio_contagem = inicio_contagem.replace(minute=0, second=0, microsecond=0)
+    fim_contagem = inicio_contagem + timedelta(hours=1)
+
+
+    while captura.isOpened():
+        ret, quadro = captura.read()
         if not ret:
             break
 
-        results = model(frame)
-        input_centroids = []
+        resultados = modelo(quadro)
+        centroides_entrada_carros = []
+        centroides_entrada_motos = []
 
-        for result in results:
-            for box in result.boxes:
-                if int(box.cls[0]) == 2 and box.conf[0] >= confidence_threshold:
-                    x1, y1, x2, y2 = map(int, box.xyxy[0])
-                    centroid_x = (x1 + x2) // 2
-                    centroid_y = (y1 + y2) // 2
-                    input_centroids.append((centroid_x, centroid_y))
-                    confidence = box.conf[0]
-                    cv2.rectangle(frame, (x1, y1), (x2, y2), (0, 255, 0), 2)
-                    cv2.putText(frame, f"Car {confidence:.2f}", (x1, y1 - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.6, (0, 255, 0), 2)
+        for resultado in resultados:
+            for caixa in resultado.boxes:
+                id_classe = int(caixa.cls[0])
+                confianca = caixa.conf[0]
 
-        objects = tracker.update(input_centroids)
+                if confianca >= limite_confianca:
+                    x1, y1, x2, y2 = map(int, caixa.xyxy[0])
+                    centroide_x = (x1 + x2) // 2
+                    centroide_y = (y1 + y2) // 2
 
-        for (objectID, centroid) in objects.items():
-            if objectID not in counted_ids:
-                total_cars += 1
-                counted_ids.add(objectID)
+                    if id_classe == 2:
+                        centroides_entrada_carros.append((centroide_x, centroide_y))
+                        cv2.rectangle(quadro, (x1, y1), (x2, y2), (0, 255, 0), 2)
+                        cv2.putText(quadro, f"Carro {confianca:.2f}", (x1, y1 - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.6,
+                                    (0, 255, 0), 2)
 
-        cv2.putText(frame, f"Carros detectados: {total_cars}", (20, 40), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 255), 2)
-        cv2.imshow("Detecção e Contagem de Carros - YOLOv8", frame)
+                    elif id_classe == 3:
+                        centroides_entrada_motos.append((centroide_x, centroide_y))
+                        cv2.rectangle(quadro, (x1, y1), (x2, y2), (255, 0, 0), 2)
+                        cv2.putText(quadro, f"Moto {confianca:.2f}", (x1, y1 - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.6,
+                                    (255, 0, 0), 2)
+
+        objetos_carros = rastreador_carros.atualizar(centroides_entrada_carros)
+        objetos_motos = rastreador_motos.atualizar(centroides_entrada_motos)
+
+        for (id_objeto, centroide) in objetos_carros.items():
+            if id_objeto not in ids_contados_carros:
+                total_carros += 1
+                ids_contados_carros.add(id_objeto)
+
+        for (id_objeto, centroide) in objetos_motos.items():
+            if id_objeto not in ids_contados_motos:
+                total_motos += 1
+                ids_contados_motos.add(id_objeto)
+
+        agora = datetime.now()
+        if agora >= fim_contagem:
+            intervalo_tempo = f"{inicio_contagem.strftime('%Hh')} - {fim_contagem.strftime('%Hh')}"
+
+            # Enviar dados ao MongoDB
+            dados_veiculos = {
+                "intervalo": intervalo_tempo,
+                "carros": total_carros,
+                "motos": total_motos,
+                "total_veiculos": total_veiculos,
+                "data_hora": datetime.now()
+            }
+            salvar_dados_mongodb(colecao_veiculos, dados_veiculos)
+
+        total_veiculos = total_carros + total_motos
+        cv2.putText(quadro, f"Carros detectados: {total_carros}", (20, 40), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 255), 2)
+        cv2.putText(quadro, f"Motos detectadas: {total_motos}", (20, 80), cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 0, 0), 2)
+        cv2.putText(quadro, f"Total de veiculos: {total_veiculos}", (20, 120), cv2.FONT_HERSHEY_SIMPLEX, 1,
+                    (0, 255, 255), 2)
+
+        cv2.imshow("Detecção e Contagem de Veículos - YOLOv11", quadro)
+
+        total_carros = 0
+        total_motos = 0
+        ids_contados_carros.clear()
+        ids_contados_motos.clear()
+
+        inicio_contagem = fim_contagem
+        fim_contagem = inicio_contagem + timedelta(hours=1)
 
         if cv2.waitKey(1) & 0xFF == ord('q'):
             break
 
-    print(f"Total de carros contados: {total_cars}")
-    cap.release()
+    print(f"Total de carros contados: {total_carros}")
+    print(f"Total de motos contadas: {total_motos}")
+    print(f"Total de veiculos contados: {total_veiculos}")
+
+    captura.release()
     cv2.destroyAllWindows()
 
-process_video_yolov8("C:/Users/dante/Downloads/teste4.mp4")
+
+processar_video_yolov11("teste5.mp4")
