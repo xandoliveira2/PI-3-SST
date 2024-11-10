@@ -51,22 +51,18 @@
     </div>
   
     <script>
-      function selecionarHora(){
-        const urlParams = new URLSearchParams(window.location.search);
 
-        const param2Value = urlParams.get("param2");
-        document.getElementById('hour_form').value = param2Value;
-      
-      }
       document.addEventListener("DOMContentLoaded", function() {
       if (url_atual.includes("param1") && url_atual.includes("param2")){
         const urlParams = new URLSearchParams(window.location.search);
 
         const param1Value = urlParams.get("param1");
+        const param2Value = urlParams.get("param2")
         
        
         document.getElementById('data_form').value = param1Value;
         atualizar_horarios()
+        document.getElementById('hour_form').value = param2Value;
       }
     })
     </script>

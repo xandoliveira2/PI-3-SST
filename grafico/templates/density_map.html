@@ -31,8 +31,11 @@ fetch('requisicao').then(response => response.json()).then( //http://localhost:8
         const data= document.getElementById('data_form').value; 
 
       
+        console.log(horas);
+        const urlParams = new URLSearchParams(window.location.search);
 
 
+        const param2 = urlParams.get('param2');
     fetch(`requisicao/horarios?param1=${data}`)
     .then(response => {
         if (!response.ok) {
@@ -50,10 +53,15 @@ fetch('requisicao').then(response => response.json()).then( //http://localhost:8
             option.textContent = item; 
             select_hora.appendChild(option); 
         });
-
-        const hora = select_hora.value; 
+        
+      
+        const hora = param2
+        document.getElementById('hour_form').value = param2
+       
+          
         const data1= document.getElementById('data_form').value; 
         const url = `/grafico/density-map/?param1=${data1}&param2=${hora}`;
+        
 
     })
     .catch(error => console.error('Erro:', error));
@@ -62,8 +70,8 @@ fetch('requisicao').then(response => response.json()).then( //http://localhost:8
 
 
     function atualizar_horarios(){
-        localStorage.clear()
-        sessionStorage.clear()
+        const urlParams = new URLSearchParams(window.location.search);
+        const param2Value = urlParams.get("param2");
         const data_formulario = document.getElementById('data_form').value;
         fetch(`requisicao/horarios?param1=${data_formulario}`)
         .then(response => {
@@ -84,6 +92,7 @@ fetch('requisicao').then(response => response.json()).then( //http://localhost:8
             option.textContent = item; 
             select_hora.appendChild(option); 
         });
+        document.getElementById('hour_form').value = param2Value;
 
     })}
 
