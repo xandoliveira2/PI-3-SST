@@ -62,7 +62,7 @@ def dcolor(value:int|float) -> str:
         return '#00ff00'
 client = pm.MongoClient('mongodb://localhost:27017/')
 db = client['teste']
-collection = db['simlulandodados1']
+collection = db['simlulandodados2']
 df = pd.DataFrame(collection.find())
 df['latitude_atualizada'] = df['latitude'].apply(hours_to_decimals_convertion)
 df['longitude_atualizada'] = df['longitude'].apply(hours_to_decimals_convertion)
@@ -173,12 +173,12 @@ def density_map_view(request):
         range_color=[10, 60],
         color_continuous_scale='Viridis',
         opacity=0.6,
-        custom_data=['total', 'motos', 'carros'],
+        custom_data=['total', 'motos', 'carros','rua'],
         color='color',
         color_discrete_map={'red': 'red', 'blue': 'blue', 'green': 'green', 'orange': 'orange'},
     )
     density_map.update_traces(
-    hovertemplate="<b> Total de veículos</b>: %{customdata[0]}<br><b>Quantidade de motos</b>: %{customdata[1]}<br><b>Quantidade de carros</b>: %{customdata[2]}<br><extra></extra>",
+    hovertemplate="<b> Rua</b>: %{customdata[3]}<br><b> Total de veículos</b>: %{customdata[0]}<br><b>Quantidade de motos</b>: %{customdata[1]}<br><b>Quantidade de carros</b>: %{customdata[2]}<br><extra></extra>",
     )
     density_map.update_layout(showlegend=False)
     grafico_html = plot(density_map,output_type='div')
@@ -208,12 +208,12 @@ def update_map(request):
         range_color=[10, 60],
         color_continuous_scale='Viridis',
         opacity=0.6,
-        custom_data=['total', 'motos', 'carros'],
+        custom_data=['total', 'motos', 'carros','rua'],
         color='color',
         color_discrete_map={'red': 'red', 'blue': 'blue', 'green': 'green', 'orange': 'orange'},
     )
     density_map.update_traces(
-    hovertemplate="<b> Total de veículos</b>: %{customdata[0]}<br><b>Quantidade de motos</b>: %{customdata[1]}<br><b>Quantidade de carros</b>: %{customdata[2]}<br><extra></extra>",
+    hovertemplate="<b> Rua</b>: %{customdata[3]}<br><b> Total de veículos</b>: %{customdata[0]}<br><b>Quantidade de motos</b>: %{customdata[1]}<br><b>Quantidade de carros</b>: %{customdata[2]}<br><extra></extra>",
     )
     density_map.update_layout(showlegend=False)
     grafico_html = plot(density_map,output_type='div')
