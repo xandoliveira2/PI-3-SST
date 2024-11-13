@@ -36,6 +36,11 @@
       {% endblock %}
 
     </select>
+    <input type="checkbox" name="carros" id="carros">Carros
+    <input type="checkbox" name="motos" id="motos">Motos
+    <input type="checkbox" name="vans" id="vans" disabled>Vans
+    <input type="checkbox" name="caminhoes" id="caminhoes" disabled>Caminhões
+    <input type="checkbox" name="onibus" id="onibus" disabled>Onibus
     <button class="btn btn-primary" onclick="atualizarMapaComParametros()"></button>
 
 
@@ -57,7 +62,36 @@
         const urlParams = new URLSearchParams(window.location.search);
 
         const param1Value = urlParams.get("param1");
-        const param2Value = urlParams.get("param2")
+        const param2Value = urlParams.get("param2");
+        let param3value = urlParams.get("param3");
+        if (param3value){
+          param3value = param3value.trim()
+        let arraysplit = param3value.split(" ");
+console.log(arraysplit)
+arraysplit.forEach(element => {
+  console.log(element)
+    if (element) { 
+        switch (element) {
+            case "carros":
+                document.getElementById(element).checked = true;
+                break;
+            case "motos":
+                document.getElementById(element).checked = true;
+                break;
+            case "vans":
+                document.getElementById(element).checked = true;
+                break;
+            case "caminhoes":
+                document.getElementById(element).checked = true;
+                break;
+            case "onibus":
+                document.getElementById(element).checked = true;
+                break;
+            default:
+                break;
+        }
+    }
+});}
         
        
         document.getElementById('data_form').value = param1Value;

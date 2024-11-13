@@ -125,11 +125,56 @@ fetch('requisicao').then(response => response.json()).then( //http://localhost:8
         function atualizarMapaComParametros(){
             const data = document.getElementById('data_form').value;
             const hora = document.getElementById('hour_form').value;
-            const url = `http://localhost:8000/grafico/density-map/?param1=${data}&param2=${hora}`
-        
-            window.location.href = url
-            document.getElementById('data_form').value = data
-            document.getElementById('hour_form').value = hora
+            let filtros = "";
+if (document.getElementById("carros").checked){
+    filtros += document.getElementById("carros").id + '%20'; 
+}
+if (document.getElementById("motos").checked){
+    filtros += document.getElementById("motos").id + '%20';
+}
+if (document.getElementById("vans").checked){
+    filtros += document.getElementById("vans").id + '%20';
+}
+if (document.getElementById("caminhoes").checked){
+    filtros += document.getElementById("caminhoes").id + '%20';
+}
+if (document.getElementById("onibus").checked){
+    filtros += document.getElementById("onibus").id + '%20';
+}
+
+
+filtros = filtros.trim(); // Remove o espaço ou '%20' extra no final, se houver
+
+// Criação da URL
+const url = `http://localhost:8000/grafico/density-map/?param1=${data}&param2=${hora}&param3=${filtros}`;
+window.location.href = url;
+
+
+// let arraysplit = filtros.split("%20");
+// console.log(arraysplit)
+// arraysplit.forEach(element => {
+//     if (element) { 
+//         switch (element) {
+//             case "carros":
+//                 document.getElementById(element).checked = true;
+//                 break;
+//             case "motos":
+//                 document.getElementById(element).checked = true;
+//                 break;
+//             case "vans":
+//                 document.getElementById(element).checked = true;
+//                 break;
+//             case "caminhoes":
+//                 document.getElementById(element).checked = true;
+//                 break;
+//             case "onibus":
+//                 document.getElementById(element).checked = true;
+//                 break;
+//             default:
+//                 break;
+//         }
+//     }
+// });
         }
     </script>
 
