@@ -155,14 +155,22 @@ def density_map_view(request):
     filtro_data = request.GET.get('param1')
     filtro_hora = request.GET.get('param2')
     filtro_veiculos = request.GET.get('param3')
-    filtro_veiculos = filtro_veiculos.split('%20')
+
+    filtro_veiculos = filtro_veiculos.split(' ')
+    while '' in filtro_veiculos:
+        filtro_veiculos.remove('')
+    
     
     df_filtered1 = df[(df['horario']==filtro_hora) & (df['data'] == filtro_data)]
     # df_filtered1['Total de veículos '] = df_filtered1['total'].apply(lambda x : f' {x}')
     # df_filtered1['Quantidade de carros '] = df_filtered1['motos'].apply(lambda x : f' {x}')
     # df_filtered1['Quantidade de motos '] = df_filtered1['carros'].apply(lambda x : f' {x}')
+    df_filtered1['total'] = 0
+    for itens in filtro_veiculos:
+        df_filtered1['total'] += df_filtered1[itens]
     df_filtered1['size_column'] = df_filtered1['total'].apply(lambda x: x if x != 0 else 0.5)
 
+    
     # Cria o gráfico
     density_map = pe.scatter_mapbox(
         df_filtered1,
@@ -180,7 +188,7 @@ def density_map_view(request):
         color_discrete_map={'#ff0000': 'red', '#00ff00': 'green', '#ffa500': 'orange', '#0000ff': 'blue','#ffff00':'yellow'},
     )
     density_map.update_traces(
-    hovertemplate="<b> Rua</b>: %{customdata[0]}<br><b>Total de veículos</b>: %{customdata[1]}<br><b>Quantidade de motos</b>: %{customdata[1]}<br><b>Quantidade de carros</b>: %{customdata[2]}<br><extra></extra>",
+    hovertemplate="<b> Rua</b>: %{customdata[0]}<br><b>Total de veículos</b>: %{customdata[1]}<br><b>Quantidade de motos</b>: %{customdata[2]}<br><b>Quantidade de carros</b>: %{customdata[3]}<br><extra></extra>",
     )
     density_map.update_layout(showlegend=False)
     grafico_html = plot(density_map,output_type='div')
