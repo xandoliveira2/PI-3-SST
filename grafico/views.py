@@ -206,6 +206,7 @@ def density_map_view(request):
     hover_template_str = ""
     for i, j in enumerate(base):
         hover_template_str += f"{base[i].capitalize()}: %"+"{"+"customdata["+f"{i}"+"]"+"}<br>"
+    hover_template_str+='<extra></extra>'
     density_map.update_traces(hovertemplate = hover_template_str)
     density_map.update_layout(showlegend=False)
     grafico_html = plot(density_map,output_type='div')
