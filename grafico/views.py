@@ -156,7 +156,9 @@ def density_map_view(request):
     filtro_hora = request.GET.get('param2')
     filtro_veiculos = request.GET.get('param3')
     base = ['rua','total']
-    if ' ' in filtro_veiculos:
+    if not filtro_veiculos:
+        filtro_veiculos = ['carros','motos']
+    else:
         filtro_veiculos = filtro_veiculos.split(' ')
     while '' in filtro_veiculos:
         filtro_veiculos.remove('')

@@ -19,7 +19,7 @@
   <body>
         <script>
       const url_atual = window.location.href
-      if (!url_atual.includes("param1") || !url_atual.includes("param2")){
+      if (!url_atual.includes("param1") || !url_atual.includes("param2") || !url_atual.includes("param2")){
         window.location.replace("http://localhost:8000/grafico/density-map/?param1=01/12/2024&param2=00:00&param3=carros%20motos%20");
       }
     </script>
@@ -36,6 +36,18 @@
       {% endblock %}
 
     </select>
+<!-- 
+    <select name="ruas" id="ruas" multiple >
+     <option value="none">Selecione as ruas</option>
+     <option value="">rua A</option>                                 FAZER UM SELECT MELHORZINHO DO QUE O PADRÃO
+     <option value="">rua B</option>
+     <option value="">rua C</option>
+     <option value="">rua D</option>
+     <option value="">rua E</option>
+
+
+    </select> -->
+
     <input type="checkbox" name="carros" id="carros">Carros
     <input type="checkbox" name="motos" id="motos">Motos
     <input type="checkbox" name="vans" id="vans" disabled>Vans
