@@ -192,10 +192,16 @@ window.location.href = url;
      document.getElementById('azul').value
      )
      {
-        const atualUrl = window.location.href
+        const urlParams = new URLSearchParams(window.location.search);
+        let atualUrl = window.location.href
         dados = document.getElementById('vermelho').value + "_" + document.getElementById('laranja').value  + "_" + document.getElementById('amarelo').value + "_" + document.getElementById('azul').value;
-        const urlDestino = atualUrl+`&param4=${dados}`
-        
+        let urlDestino = ''
+        if (atualUrl.includes('param4')){
+            atualUrl = urlParams.set("param4",dados);
+            urlDestino = atualUrl
+        }else{
+        urlDestino = atualUrl+`&param4=${dados}`
+        }
        
 
         window.location.href = urlDestino
