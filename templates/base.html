@@ -19,7 +19,7 @@
   <body>
         <script>
       const url_atual = window.location.href
-      if (!url_atual.includes("param1") || !url_atual.includes("param2") || !url_atual.includes("param2")){
+      if (!url_atual.includes("param1") || !url_atual.includes("param2") || !url_atual.includes("param3")){
         window.location.replace("http://localhost:8000/grafico/density-map/?param1=01/12/2024&param2=00:00&param3=carros%20motos%20");
       }
     </script>
@@ -36,6 +36,21 @@
       {% endblock %}
 
     </select>
+    <div class="configuracao">
+      <label for="vermelho">Vermelho:</label>
+      <input type="text" id="vermelho" name="vermelho">
+      <label for="laranja">Laranja:</label>
+      <input type="text" id="laranja" name="laranja">
+      <label for="amarelo">Amarelo:</label>
+      <input type="text" id="amarelo" name="amarelo">
+      <label for="azul">Azul:</label>
+      <input type="text" id="azul" name="azul">
+      <label for="verde">Verde:</label>
+      <input type="text" id="verde" name="verde" disabled value="Verde será tudo abaixo de azul">
+      {% block 'colorConfiguration' %}
+      {% endblock %}
+      <button onclick="atualizarCores()">Atualizar cores</button>
+    </div>
 <!-- 
     <select name="ruas" id="ruas" multiple >
      <option value="none">Selecione as ruas</option>

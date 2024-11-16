@@ -42,91 +42,44 @@ def hours_to_decimals_convertion(formato:str):
         return decimal
     else:
         return formato
-def dcolor(value:int|float) -> str:
-    """Gera o a cor o qual aquele valor será representado no mapa, cujo valores são:\n
-    vermelho para maior que 50\n
-    laranja para maiores que 35 e menor que 51\n
-    amarelo para maiores que 25 e menor que 36\n
-    azul para maiores que 15 e menor que 26\n
-    verde para menores que 16\n
+def dcolor(value:int|float,valores:list) -> str:
+    """Gera o a cor o qual aquele valor será representado no mapa, cujo valores são\n
+    definidos pelo usuário em ordem decrescente, ou seja, o primeiro valor\n
+    da lista será o vermelho,laranja,amarelo,azul e verde respectivamente\n
     opacidade 55 representado em hexadecimal equivale a 33% de opacidade"""
-    if value > 50:
+    if value > int(valores[0]):
         return '#ff0000'
-    elif value > 35:
+    elif value > int(valores[1]):
         return '#ffa500'
-    elif value > 25:
+    elif value > int(valores[2]):
         return '#ffff00'
-    elif value > 15:
+    elif value > int(valores[3]):
         return '#0000ff'
     else:
         return '#00ff00'
+def aplicarCores(ParametrosValores=[50,35,25,15]):
+    df['color'] = df['total'].apply(lambda value: dcolor(value, ParametrosValores))
+   
+    
+    
+    
 client = pm.MongoClient('mongodb://localhost:27017/')
 db = client['teste']
 collection = db['simlulandodados2']
 df = pd.DataFrame(collection.find())
 df['latitude_atualizada'] = df['latitude'].apply(hours_to_decimals_convertion)
 df['longitude_atualizada'] = df['longitude'].apply(hours_to_decimals_convertion)
-df['color'] = df['total'].apply(dcolor)
+# df['color'] = df['total'].apply(dcolor)
+
+
+
+
 df['identificador_rua'] = df['latitude_atualizada'].astype(str)+df['longitude_atualizada'].astype(str)
 df['data'] = pd.to_datetime(df['data'],format='%d/%m/%Y') 
 df['data'] = df['data'].dt.strftime('%d/%m/%Y') 
 df['size_column'] = df['total'].apply(lambda x: x if x != 0 else 0.1)
 df = df.sort_values('data')
-# Importações necessárias
 
-# Classe do formulário
-
-
-
-# View principal
-# def density_map_view(request):
-
-#     df_filtered1 = df
-
-    
-
-
-#     df_filtered1['Total de veículos '] = df_filtered1['total'].apply(lambda x: f' {x}')
-#     df_filtered1['Quantidade de carros '] = df_filtered1['motos'].apply(lambda x: f' {x}')
-#     df_filtered1['Quantidade de motos '] = df_filtered1['carros'].apply(lambda x: f' {x}')
-    
-
-#     density_map = pe.scatter_mapbox(
-#         df_filtered1,
-#         lat='latitude_atualizada',
-#         lon='longitude_atualizada',
-#         mapbox_style="carto-darkmatter",
-#         center={'lat': -22.436491574441884, 'lon': -46.823405867130425},
-#         zoom=14,
-#         size='size_column',
-#         range_color=[10, 60],
-#         color_continuous_scale='Viridis',
-#         opacity=0.6,
-#         custom_data=['total', 'motos', 'carros'],
-#         color='color',
-#         color_discrete_map={'red': 'red', 'blue': 'blue', 'green': 'green', 'orange': 'orange'},
-#     )
-#     density_map.update_traces(
-#         hovertemplate="<b> Total de veículos</b>: %{customdata[0]}<br>"
-#                       "<b>Quantidade de motos</b>: %{customdata[1]}<br>"
-#                       "<b>Quantidade de carros</b>: %{customdata[2]}<br><extra></extra>",
-#     )
-#     density_map.update_layout(showlegend=False)
-
-#     density_map_json = density_map.to_json()
-    
-#     return render(request, 'density_map.html', {
-#         'density_map_json': density_map_json,  # O JSON do mapa que você criou
-         
-#     }
-#                   )
-
-
-# class DensityFilterForm(forms.Form):
-
-#     df = df.sort_values('data')
-#     data_choices = [(data, data) for data in df['data'].unique()]
-#     dia = forms.ChoiceField(choices=data_choices)
 @csrf_exempt
 def recebe_data(request):
     if request.method == "POST":
@@ -150,8 +103,19 @@ def enviar_coluna_horarios(request):
     horas = sorted(horas)
     
     return JsonResponse({'horas':horas})
-    
+
+contadorPagina = 0
 def density_map_view(request):
+    global contadorPagina  
+    if contadorPagina  == 0:
+        contadorPagina+=1
+        aplicarCores()
+    else:
+        if request.GET.get('param4'):
+            valores = request.GET.get('param4').split('_')
+            print(valores)  
+            aplicarCores(valores)
+    
     filtro_data = request.GET.get('param1')
     filtro_hora = request.GET.get('param2')
     filtro_veiculos = request.GET.get('param3')
@@ -167,26 +131,14 @@ def density_map_view(request):
     
         
     df_filtered1 = df[(df['horario']==filtro_hora) & (df['data'] == filtro_data)]
-    # df_filtered1['Total de veículos '] = df_filtered1['total'].apply(lambda x : f' {x}')
-    # df_filtered1['Quantidade de carros '] = df_filtered1['motos'].apply(lambda x : f' {x}')
-    # df_filtered1['Quantidade de motos '] = df_filtered1['carros'].apply(lambda x : f' {x}')
-    # hoverTemplateString = f"<b> Rua</b>:{df_filtered1['rua']}<br>"
-    # hoverdict = {
-    #     'carros' : f"<b>Quantidade de carros</b>: {df_filtered1['carros']}<br>",
-    #     'motos' : f"<b>Quantidade de motos</b>: {df_filtered1['motos']}<br>",
-    #     #'vans' : f"<b>Quantidade de motos</b>: {df_filtered1['carros']}<br>",
-    #     #'onibus' : f"<b>Quantidade de motos</b>: {df_filtered1['carros']}<br>",
-    #     #'caminhoes' : f"<b>Quantidade de motos</b>: {df_filtered1['carros']}<br>",
-    # }
-    # for filtro in filtro_veiculos:
-    #     hoverTemplateString+=hoverdict[filtro]
+  
     df_filtered1['total'] = 0
     for itens in filtro_veiculos:
         df_filtered1['total'] += df_filtered1[itens]
     df_filtered1['size_column'] = df_filtered1['total'].apply(lambda x: x if x != 0 else 0.5)
 
     
-    # Cria o gráfico
+ 
     density_map = pe.scatter_mapbox(
         df_filtered1,
         lat='latitude_atualizada',
@@ -202,9 +154,7 @@ def density_map_view(request):
         color='color',
         color_discrete_map={'#ff0000': 'red', '#00ff00': 'green', '#ffa500': 'orange', '#0000ff': 'blue','#ffff00':'yellow'},
     )
-    # density_map.update_traces(
-    # hovertemplate=f"{hoverTemplateString}<extra></extra>",
-    # )
+
     hover_template_str = ""
     for i, j in enumerate(base):
         hover_template_str += f"{base[i].capitalize()}: %"+"{"+"customdata["+f"{i}"+"]"+"}<br>"
@@ -212,46 +162,46 @@ def density_map_view(request):
     density_map.update_traces(hovertemplate = hover_template_str)
     density_map.update_layout(showlegend=False)
     grafico_html = plot(density_map,output_type='div')
-    # density_map_json = density_map.to_json()
+ 
     
     return render(request, 'density_map.html',{'grafico_html':grafico_html})
 
-def update_map(request):
-    filtro_data = request.GET.get('param1')
-    filtro_hora = request.GET.get('param2')
-
+# def update_map(request):
+#     filtro_data = request.GET.get('param1')
+#     filtro_hora = request.GET.get('param2')
+#     aplicarCores()
  
-    df_filtered1 = df[(df['horario']==filtro_hora) & (df['data'] == filtro_data)]
-    df_filtered1['Total de veículos '] = df_filtered1   ['total'].apply(lambda x : f' {x}')
-    # df_filtered1['Quantidade de carros '] = df_filtered1['motos'].apply(lambda x : f' {x}')
-    # df_filtered1['Quantidade de motos '] = df_filtered1['carros'].apply(lambda x : f' {x}')
-    df_filtered1['size_column'] = df_filtered1['total'].apply(lambda x: x if x != 0 else 0.1)
+#     df_filtered1 = df[(df['horario']==filtro_hora) & (df['data'] == filtro_data)]
+#     df_filtered1['Total de veículos '] = df_filtered1   ['total'].apply(lambda x : f' {x}')
+#     # df_filtered1['Quantidade de carros '] = df_filtered1['motos'].apply(lambda x : f' {x}')
+#     # df_filtered1['Quantidade de motos '] = df_filtered1['carros'].apply(lambda x : f' {x}')
+#     df_filtered1['size_column'] = df_filtered1['total'].apply(lambda x: x if x != 0 else 0.1)
 
-    # Cria o gráfico
-    density_map = pe.scatter_mapbox(
-        df_filtered1,
-        lat='latitude_atualizada',
-        lon='longitude_atualizada',
-        mapbox_style="carto-darkmatter",
-        center={'lat': -22.436491574441884, 'lon': -46.823405867130425},
-        zoom=14,
-        size='size_column',
-        range_color=[10, 60],
-        color_continuous_scale='Viridis',
-        opacity=0.6,
-        custom_data=['rua','total', 'motos', 'carros'],
-        color='color',
-        color_discrete_map={'red': 'red', 'blue': 'blue', 'green': 'green', 'orange': 'orange'},
-    )
-    density_map.update_traces(
-    hovertemplate="<b> Rua</b>: %{customdata[0]}<br><b>?Total de veículos</b>: %{customdata[1]}<br><b>Quantidade de motos</b>: %{customdata[1]}<br><b>Quantidade de carros</b>: %{customdata[2]}<br><extra></extra>",
-    )
-    density_map.update_layout(showlegend=False)
-    grafico_html = plot(density_map,output_type='div')
-    # density_map_json = density_map.to_json()
+#     # Cria o gráfico
+#     density_map = pe.scatter_mapbox(
+#         df_filtered1,
+#         lat='latitude_atualizada',
+#         lon='longitude_atualizada',
+#         mapbox_style="carto-darkmatter",
+#         center={'lat': -22.436491574441884, 'lon': -46.823405867130425},
+#         zoom=14,
+#         size='size_column',
+#         range_color=[10, 60],
+#         color_continuous_scale='Viridis',
+#         opacity=0.6,
+#         custom_data=['rua','total', 'motos', 'carros'],
+#         color='color',
+#         color_discrete_map={'red': 'red', 'blue': 'blue', 'green': 'green', 'orange': 'orange'},
+#     )
+#     density_map.update_traces(
+#     hovertemplate="<b> Rua</b>: %{customdata[0]}<br><b>?Total de veículos</b>: %{customdata[1]}<br><b>Quantidade de motos</b>: %{customdata[1]}<br><b>Quantidade de carros</b>: %{customdata[2]}<br><extra></extra>",
+#     )
+#     density_map.update_layout(showlegend=False)
+#     grafico_html = plot(density_map,output_type='div')
+#     # density_map_json = density_map.to_json()
     
   
-    # return JsonResponse({'grafico_html':grafico_html})
-    return render(request, 'fetch.html',{'grafico_html':grafico_html})
+#     # return JsonResponse({'grafico_html':grafico_html})
+#     return render(request, 'fetch.html',{'grafico_html':grafico_html})
 
 # Create your views here
