@@ -10,6 +10,8 @@ from django.views.decorators.csrf import csrf_exempt
 import json
 import plotly.graph_objs as go
 import numpy as np
+import os
+from django.conf import settings
 def hours_to_decimals_convertion(formato:str):
     """
     formato : horas:minutos:segundos:direção (latitude e longitude)\n
@@ -47,18 +49,17 @@ def dcolor(value:int|float,valores:list) -> str:
     definidos pelo usuário em ordem decrescente, ou seja, o primeiro valor\n
     da lista será o vermelho,laranja,amarelo,azul e verde respectivamente\n
     opacidade 55 representado em hexadecimal equivale a 33% de opacidade"""
-    if value > int(valores[0]):
+    if value >= int(valores[0]):
         return '#ff0000'
-    elif value > int(valores[1]):
+    elif value >= int(valores[1]):
         return '#ffa500'
-    elif value > int(valores[2]):
+    elif value >= int(valores[2]):
         return '#ffff00'
-    elif value > int(valores[3]):
+    elif value >= int(valores[3]):
         return '#0000ff'
     else:
         return '#00ff00'
-def aplicarCores(ParametrosValores=[50,35,25,15]):
-    df['color'] = df['total'].apply(lambda value: dcolor(value, ParametrosValores))
+
    
     
     
@@ -71,6 +72,8 @@ df['latitude_atualizada'] = df['latitude'].apply(hours_to_decimals_convertion)
 df['longitude_atualizada'] = df['longitude'].apply(hours_to_decimals_convertion)
 # df['color'] = df['total'].apply(dcolor)
 
+def aplicarCores(dataframe = df,ParametrosValores=[50,35,25,15]):
+    dataframe['color'] = dataframe['total'].apply(lambda value: dcolor(int(value), ParametrosValores))
 
 
 
@@ -106,54 +109,63 @@ def enviar_coluna_horarios(request):
 
 contadorPagina = 0
 def density_map_view(request):
-    global contadorPagina  
-    if contadorPagina  == 0:
-        contadorPagina+=1
-        aplicarCores()
-        data = {
-                "vermelho" : 50,
-                "laranja" : 35,
-                "amarelo" : 25,
-                "azul" : 15,
-                "verde": 14
-            }
-        with open('static/cores.json', 'w') as jsonFile:
-            json.dump(data, jsonFile, indent=4)
-    else:
-        if request.GET.get('param4'):
-            valores = request.GET.get('param4').split('_')
-            aplicarCores(valores)
-            data = {
-                "vermelho" : valores[0],
-                "laranja" : valores[1],
-                "amarelo" : valores[2],
-                "azul" : valores[3],
-                "verde": int(valores[3])-1
-            }
-            with open('static/cores.json', 'w') as jsonFile:
-                json.dump(data, jsonFile, indent=4)
-    
+    global contadorPagina
+    print(contadorPagina)
     filtro_data = request.GET.get('param1')
     filtro_hora = request.GET.get('param2')
-    filtro_veiculos = request.GET.get('param3')
-    base = ['rua','total']
-    if not filtro_veiculos:
-        filtro_veiculos = ['carros','motos']
-    else:
-        filtro_veiculos = filtro_veiculos.split(' ')
+    filtro_veiculos = request.GET.get('param3', 'carros motos')  # Default para 'carros motos'
+
+    filtro_veiculos = filtro_veiculos.split()
     while '' in filtro_veiculos:
         filtro_veiculos.remove('')
-    for i in filtro_veiculos:
-        base.insert(1,i)
     
-        
-    df_filtered1 = df[(df['horario']==filtro_hora) & (df['data'] == filtro_data)]
-  
-    df_filtered1['total'] = 0
-    for itens in filtro_veiculos:
-        df_filtered1['total'] += df_filtered1[itens]
-    df_filtered1['size_column'] = df_filtered1['total'].apply(lambda x: x if x != 0 else 0.5)
+    base = ['rua','total'] + filtro_veiculos
 
+    df_filtered1 = df[(df['horario'] == filtro_hora) & (df['data'] == filtro_data)]
+    
+    if df_filtered1.empty:
+        return JsonResponse({'erro': 'Nenhum dado encontrado para os filtros fornecidos'}, status=400)
+    
+    df_filtered1['total'] = 0
+    for item in filtro_veiculos:
+        df_filtered1['total'] += df_filtered1[item]
+
+    df_filtered1['size_column'] = df_filtered1['total'].apply(lambda x: x if x != 0 else 0.5)
+    
+    # Aplica cores antes de usar no gráfico
+    if 'param4' in request.GET:
+        valores = request.GET.get('param4').split('_')
+        aplicarCores(df_filtered1, valores)
+        data = {
+            "vermelho": valores[0],
+            "laranja": valores[1],
+            "amarelo": valores[2],
+            "azul": valores[3],
+            "verde": int(valores[3]) - 1
+        }
+    elif contadorPagina == 0:
+        aplicarCores(df_filtered1)
+        data = {
+            "vermelho": 50,
+            "laranja": 35,
+            "amarelo": 25,
+            "azul": 15,
+            "verde": 14
+        }
+        contadorPagina +=1
+    else:
+        listaCor = []
+        with open('static/cores.json', 'r') as jsonFile:
+            data = json.load(jsonFile)
+            listaCor.append(int(data["vermelho"]))
+            listaCor.append(int(data["laranja"]))
+            listaCor.append(int(data["amarelo"]))
+            listaCor.append(int(data["azul"]))
+        aplicarCores(df_filtered1,listaCor)
+    # Salva as cores no arquivo JSON
+    file_path = os.path.join(settings.BASE_DIR, 'static', 'cores.json')
+    with open(file_path, 'w') as jsonFile:
+        json.dump(data, jsonFile, indent=4)
     
  
     density_map = pe.scatter_mapbox(
