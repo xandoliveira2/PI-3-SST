@@ -110,11 +110,28 @@ def density_map_view(request):
     if contadorPagina  == 0:
         contadorPagina+=1
         aplicarCores()
+        data = {
+                "vermelho" : 50,
+                "laranja" : 35,
+                "amarelo" : 25,
+                "azul" : 15,
+                "verde": 14
+            }
+        with open('static/cores.json', 'w') as jsonFile:
+            json.dump(data, jsonFile, indent=4)
     else:
         if request.GET.get('param4'):
             valores = request.GET.get('param4').split('_')
-            print(valores)  
             aplicarCores(valores)
+            data = {
+                "vermelho" : valores[0],
+                "laranja" : valores[1],
+                "amarelo" : valores[2],
+                "azul" : valores[3],
+                "verde": int(valores[3])-1
+            }
+            with open('static/cores.json', 'w') as jsonFile:
+                json.dump(data, jsonFile, indent=4)
     
     filtro_data = request.GET.get('param1')
     filtro_hora = request.GET.get('param2')

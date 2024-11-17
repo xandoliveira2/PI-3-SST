@@ -1,3 +1,4 @@
+{% load static %}
 <!doctype html>
 <html lang="en">
   <head>
@@ -36,6 +37,29 @@
       {% endblock %}
 
     </select>
+    
+    <script>
+
+      fetch('{% static "cores.json" %}').then(response => response.json()).then(data => {
+     
+      let vermelho = data.vermelho;
+      let laranja = data.laranja;
+      let amarelo = data.amarelo;
+      let azul = data.azul;
+      let h2RED = document.getElementById('vermelho');
+      let h2ORANGE = document.getElementById('laranja');
+      let h2YELLOW = document.getElementById('amarelo');
+      let h2BLUE = document.getElementById('azul');
+      let h2GREEN = document.getElementById('verde');
+      h2RED.value = vermelho;
+      h2ORANGE.value = laranja;
+      h2YELLOW.value = amarelo;
+      h2BLUE.value = azul;
+      h2GREEN.value = azul - 1;
+      })
+
+    </script>
+   
     <div class="configuracao">
       <label for="vermelho">Vermelho:</label>
       <input type="text" id="vermelho" name="vermelho">
