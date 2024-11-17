@@ -1,0 +1,156 @@
+body {}
+.container{
+  margin-top: 60px;
+}
+
+a{
+  text-decoration: none;
+}
+
+/* Navbar */
+nav {
+  width: 100%;
+  height: 60px;
+  background-color: #000B58;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
+}
+
+nav ul {
+  display: flex;
+  margin-right: 15px;
+  margin-bottom: 0;
+  padding: 0;
+  width: 100px;
+  justify-content: space-between;
+}
+
+nav li {
+  list-style: none;
+  text-decoration: none;
+  font-style: none;
+  font-size: 1em;
+  color: white;
+}
+
+/* Botao */
+.botao {
+  background-color: #83B4FF;
+  border-radius: 100px;
+  color: white;
+  border: none;
+  padding: 5px 15px;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  font-size: 16px;
+  margin: 4px 2px;
+  cursor: pointer;
+  width: fit-content;
+  font-weight: bold;
+}
+
+.botao:hover {
+  transition: 0.5s;
+  background-color: #6b94d1;
+}
+
+
+
+
+/* -- Filtros -- */
+.titulo-filtro{
+  display: flex;
+  align-items: center;
+  margin-bottom: 10px;
+}
+.titulo-filtro img{
+  height: 25px;
+}
+
+fieldset {
+  border: 2px solid #a3a3a3; 
+  padding: 20px 15px 15px 15px; 
+  background-color: #ffffff; 
+  position: relative; 
+  display: flex;
+  box-shadow: 0px 5px 10px -7px #909090;
+  margin-bottom: 25px;
+  flex-wrap: wrap;
+}
+
+legend {
+  font-size: 1.25rem; /* Aumenta o tamanho da fonte */
+  color: #000000; /* Cor da fonte */
+  padding: 0 10px; /* Ajusta o espaçamento ao redor do texto */
+  background-color: #ffffff; /* Fundo branco para o legend */
+  position: absolute; /* Posiciona o legend fora da borda do fieldset */
+  top: -15px; /* Ajuste a distância do topo para sobrepor o fieldset */
+  left: 20px; /* Ajuste para alinhar com o conteúdo */
+  width: fit-content;
+}
+
+.container-input{
+  margin-right: 30px;
+  width: fit-content;
+}
+
+
+.configuracao{
+  width: 100%;
+}
+
+.configuracao input{
+  width: 100px;
+}
+
+/* Wrapper */
+.wrapper{
+  display: flex;
+  align-items: center;
+}
+
+.wrapper img{
+  margin-right: 2px;
+  height: 25px;
+}
+
+.wrapper p{
+  margin: 0px;
+}
+
+
+/* Data/Hora */
+.data-hora img[alt="icone relogio"]{
+  height: 20px;
+
+}
+
+
+/* Veiculos */
+.v{
+  margin-right: 20px;
+}
+
+/* Configuração Cores */
+.container-cores{
+  display: flex;
+  margin-bottom: 15px;
+  flex-wrap: wrap;
+}
+.container-cores input[type="text"]{
+  border: 1px rgb(198, 198, 198) solid;
+  border-radius: 5px;
+  margin-left: 2px;
+  height: 30px;
+}
+
+
+/* Checkbox */
+input[type=checkbox] {
+  position: relative;
+  cursor: pointer;
+  margin: 3px;
+}

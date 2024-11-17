@@ -5,7 +5,7 @@ import pandas as pd
 class DensityFilterForm(forms.Form):
     client = pm.MongoClient('mongodb://localhost:27017/')
     db = client['teste']
-    collection = db['simlulandodados1']
+    collection = db['simlulandodados2']
     df = pd.DataFrame(collection.find())
     df['data'] = pd.to_datetime(df['data'],format='%d/%m/%Y') 
     df['data'] = df['data'].dt.strftime('%d/%m/%Y') 
