@@ -123,8 +123,7 @@ def density_map_view(request):
 
     df_filtered1 = df[(df['horario'] == filtro_hora) & (df['data'] == filtro_data)]
     
-    if df_filtered1.empty:
-        return JsonResponse({'erro': 'Nenhum dado encontrado para os filtros fornecidos'}, status=400)
+    
     
     df_filtered1['total'] = 0
     for item in filtro_veiculos:

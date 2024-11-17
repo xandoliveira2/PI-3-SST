@@ -123,6 +123,15 @@ fetch('requisicao').then(response => response.json()).then( //http://localhost:8
     
         }
         function atualizarMapaComParametros(){
+            if (!document.getElementById("carros").checked &&
+            !document.getElementById("motos").checked&&
+            !document.getElementById("vans").checked &&
+            !document.getElementById("caminhoes").checked &&
+            !document.getElementById("onibus").checked){
+                alert("Selecione ao menos 1 tipo de veículo")
+            }  else {
+
+
             const data = document.getElementById('data_form').value;
             const hora = document.getElementById('hour_form').value;
             let filtros = "";
@@ -175,7 +184,7 @@ window.location.href = url;
 //         }
 //     }
 // });
-        }
+        }}
     </script>
 
 {% endblock %}
