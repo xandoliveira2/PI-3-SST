@@ -1,0 +1,111 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-color: #000B58;
+            height: 100vh;
+            margin: 0;
+        }
+        .login-container {
+            background: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            width: 300px;
+        }
+        .login-container h2 {
+            text-align: center;
+        }
+        .login-container input {
+            padding: 10px;
+            margin: 10px 0;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+        .login-container button {
+            width: 100%;
+            padding: 10px;
+            background-color: #28a745;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .login-container button:hover {
+            background-color: #218838;
+        }
+        .error {
+            color: red;
+            text-align: center;
+            font-size: 14px;
+        }
+        #loginForm{
+            display: flex;
+            flex-direction: column;
+        }
+    </style>
+</head>
+<body>
+    <div class="login-container">
+        <h2>Login</h2>
+        <form id="loginForm">
+            <input type="text" id="username" placeholder="Usuário" required>
+            <input type="password" id="password" placeholder="Senha" required>
+            <button type="submit">Entrar</button>
+            <p id="errorMessage" class="error"></p>
+        </form>
+    </div>
+    <script>
+
+        // URL do arquivo JSON
+const USERS_JSON_URL = '{% static "usuarios.json" %}';
+
+// Função para validar login
+async function validateLogin(username, password) {
+    try {
+        const response = await fetch(USERS_JSON_URL);
+        const users = await response.json();
+
+        // Verifica se o usuário e a senha existem no JSON
+        const user = users.find(user => user.username === username && user.password === password);
+        return user !== undefined;
+    } catch (error) {
+        console.error('Erro ao carregar os dados dos usuários:', error);
+        return false;
+    }
+}
+
+// Captura o formulário de login
+const loginForm = document.getElementById('loginForm');
+const errorMessage = document.getElementById('errorMessage');
+
+// Adiciona o evento de submissão
+loginForm.addEventListener('submit', async (e) => {
+    e.preventDefault();
+
+    const username = document.getElementById('username').value.trim();
+    const password = document.getElementById('password').value.trim();
+
+    // Valida o login
+    const isValid = await validateLogin(username, password);
+
+    if (isValid) {
+        window.location.href = '{% url "grafico:update_map" %}'; 
+    } else {
+        errorMessage.textContent = 'Usuário ou senha inválidos!';
+    }
+});
+
+    </script>
+</body>
+</html>

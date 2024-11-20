@@ -1,7 +1,7 @@
 {
-    "vermelho": "30",
-    "laranja": "20",
-    "amarelo": "15",
-    "azul": "10",
-    "verde": 9
+    "vermelho": 50,
+    "laranja": 35,
+    "amarelo": 25,
+    "azul": 15,
+    "verde": 14
 }

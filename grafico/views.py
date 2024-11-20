@@ -233,3 +233,8 @@ def density_map_view(request):
 #     return render(request, 'fetch.html',{'grafico_html':grafico_html})
 
 # Create your views here
+
+
+
+def login_view(request):
+    return render(request, 'login.html')
