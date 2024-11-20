@@ -12,6 +12,7 @@ import plotly.graph_objs as go
 import numpy as np
 import os
 from django.conf import settings
+
 def hours_to_decimals_convertion(formato:str):
     """
     formato : horas:minutos:segundos:direção (latitude e longitude)\n

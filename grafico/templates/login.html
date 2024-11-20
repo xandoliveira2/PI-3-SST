@@ -100,7 +100,7 @@ loginForm.addEventListener('submit', async (e) => {
     const isValid = await validateLogin(username, password);
 
     if (isValid) {
-        window.location.href = '{% url "grafico:update_map" %}'; 
+        window.location.href = '{% url "grafico:density_map_view" %}'; 
     } else {
         errorMessage.textContent = 'Usuário ou senha inválidos!';
     }
