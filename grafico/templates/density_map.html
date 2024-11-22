@@ -247,6 +247,31 @@ window.location.href = url;
 
 
 {% block 'colorConfiguration' %}
+<script>
+    const url_atual = window.location.href
+    if (!url_atual.includes("param1") || !url_atual.includes("param2") || !url_atual.includes("param3")) {
+      window.location.replace("http://localhost:8000/grafico/density-map/?param1=01/12/2024&param2=00:00&param3=carros%20motos%20");
+    }
+  </script>
+      <script>
+        fetch('{% static "cores.json" %}').then(response => response.json()).then(data => {
+       
+        let vermelho = data.vermelho;
+        let laranja = data.laranja;
+        let amarelo = data.amarelo;
+        let azul = data.azul;
+        let h2RED = document.getElementById('vermelho');
+        let h2ORANGE = document.getElementById('laranja');
+        let h2YELLOW = document.getElementById('amarelo');
+        let h2BLUE = document.getElementById('azul');
+        let h2GREEN = document.getElementById('verde');
+        h2RED.value = vermelho;
+        h2ORANGE.value = laranja;
+        h2YELLOW.value = amarelo;
+        h2BLUE.value = azul;
+        h2GREEN.value = azul - 1;
+        })
+      </script>
 <fieldset>
     <legend>Configuração Cores</legend>
     <div class="configuracao">
