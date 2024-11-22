@@ -1,29 +1,80 @@
 {% extends "base.html" %}
-
-{% block 'forms' %}
-
-<script>
-
-fetch('requisicao').then(response => response.json()).then( //http://localhost:8000/grafico/density-map/requisicao
-    data => { 
-        const select_dia = document.getElementById('data_form');
-        data.dados.forEach(item => {
-                    const option = document.createElement('option');
-                    option.value = item;      
-                    option.textContent = item; 
-                    select_dia.appendChild(option); 
-                });
-            }).catch(
-                error => console.error('Erro:', error));
+{% load static %}
 
 
-</script>
+{% block 'filtro_veiculos' %}
+<fieldset>
+    <legend>Veículos</legend>
+    <div class="wrapper v">
+      <input type="checkbox" name="carros" id="carros">
+      <p>Carros</p>
+    </div>
+    <div class="wrapper v">
+      <input type="checkbox" name="motos" id="motos">
+      <p>Motos</p>
+    </div>
+    <div class="wrapper v">
+      <input type="checkbox" name="vans" id="vans" disabled>
+      <p>Vans</p>
+    </div>
+    <div class="wrapper v">
+      <input type="checkbox" name="caminhoes" id="caminhoes" disabled>
+      <p>Caminhões</p>
+    </div>
+    <div class="wrapper v">
+      <input type="checkbox" name="onibus" id="onibus" disabled>
+      <p>Onibus</p>
+    </div>
+  </fieldset>
 
+  <button class="botao" onclick="atualizarMapaComParametros()">Atualizar</button>
+</div>
 {% endblock %}
 
-{% block 'hours_form' %}
+{% block 'data' %}
+<div class="container">
+    <div class="container-filtros">
+      <div class="titulo-filtro">
+        <img src="{% static 'imagens/icone-filtro.png' %}" alt="icone filtro">
+        <h3>Filtros</h3>
+      </div>
+<fieldset>
+    <legend>Data/Hora</legend>
+    <div class="container-input">
+      <div class="wrapper dataHora">
+        <img src="{% static 'imagens/icone-calendario.png' %}" alt="icone calendario">
+        <label for="data_form">Data</label>
+      </div>
+<select class="form-select" aria-label="Default select example" id="data_form" name="data_form"
+style="width: fit-content;" onclick="atualizar_url1(); atualizar_horarios()">
+<script>
 
+    fetch('requisicao').then(response => response.json()).then( //http://localhost:8000/grafico/density-map/requisicao
+        data => { 
+            const select_dia = document.getElementById('data_form');
+            data.dados.forEach(item => {
+                        const option = document.createElement('option');
+                        option.value = item;      
+                        option.textContent = item; 
+                        select_dia.appendChild(option); 
+                    });
+                }).catch(
+                    error => console.error('Erro:', error));
+    
+    
+    </script>
+</select>
+</div>
+{% endblock%}
 
+{% block 'filtro_data' %}
+<div class="container-input">
+    <div class="wrapper data-hora">
+      <img src="{% static 'imagens/icone-relogio.png' %}" alt="icone relogio">
+      <label for="hour_form">Hora</label>
+    </div>
+<select class="form-select" aria-label="Default select example" id="hour_form" name="hour_form"
+style="width: fit-content;" onclick="atualizar_url1()" onload="selecionarHora()">
 <script>
     document.addEventListener("DOMContentLoaded", evento =>{
         let ajaxExecuted = false;
@@ -187,10 +238,60 @@ window.location.href = url;
         }}
     </script>
 
+</select>
+</div>
+</fieldset>
 {% endblock %}
 
 
+
+
 {% block 'colorConfiguration' %}
+<fieldset>
+    <legend>Configuração Cores</legend>
+    <div class="configuracao">
+      <div class="container-cores">
+        <div class="container-input">
+          <label for="vermelho">Vermelho:</label>
+          <div class="wrapper">
+            <img src="{% static 'imagens/Ellipse-vermelho.png' %}" alt="">
+            <input type="text" id="vermelho" name="vermelho">
+          </div>
+          
+        </div>
+        <div class="container-input">
+          <label for="laranja">Laranja:</label>
+          <div class="wrapper">
+            <img src="{% static 'imagens/Ellipse-laranja.png' %}" alt="">
+            <input type="text" id="laranja" name="laranja">
+          </div>
+        </div>
+        <div class="container-input">
+          <label for="amarelo">Amarelo:</label>
+          <div class="wrapper">
+            <img src="{% static 'imagens/Ellipse-amarelo.png' %}" alt="">
+            <input type="text" id="amarelo" name="amarelo">
+          </div>
+        </div>
+        <div class="container-input">
+          <label for="azul">Azul:</label>
+          <div class="wrapper">
+            <img src="{% static 'imagens/Ellipse-azul.png' %}" alt="">
+            <input type="text" id="azul" name="azul">
+          </div>
+        </div>
+        <div class="container-input">
+          <label for="verde">Verde:</label>
+          <div class="wrapper">
+            <img src="{% static 'imagens/Ellipse-verde.png' %}" alt="">
+            <input type="text" id="verde" name="verde" disabled value="Verde < Azul">
+          </div>
+        </div>
+      </div>
+      
+      <button class="botao" onclick="atualizarCores()">Atualizar cores</button>
+    </div>
+  </fieldset>
 
 <script>
     function atualizarCores(){

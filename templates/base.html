@@ -49,9 +49,17 @@
         })
       </script>
 
-  <nav>
+  <nav style="width: 100%;display: flex;justify-content: space-between;align-items: center;padding-right: 50px;">
     <img src="{% static 'imagens/logo.png' %}" alt="Logo">
-    <ul>
+    
+      <a href="#">
+        <li>Gráfico</li>
+      </a>
+      <a href="#">
+        <li>Relatório</li>
+      </a>
+
+
       <a href="#">
         <li>Sobre</li>
       </a>
@@ -59,118 +67,33 @@
 
         <li>Sair</li>
       </a>
-    </ul>
+    
   </nav>
 
-  <div class="container">
-    <div class="container-filtros">
-      <div class="titulo-filtro">
-        <img src="{% static 'imagens/icone-filtro.png' %}" alt="icone filtro">
-        <h3>Filtros</h3>
-      </div>
 
-      <fieldset>
-        <legend>Data/Hora</legend>
-        <div class="container-input">
-          <div class="wrapper dataHora">
-            <img src="{% static 'imagens/icone-calendario.png' %}" alt="icone calendario">
-            <label for="data_form">Data</label>
-          </div>
-          <select class="form-select" aria-label="Default select example" id="data_form" name="data_form"
-            style="width: fit-content;" onclick="atualizar_url1(); atualizar_horarios()">
-            {% block 'forms' %}{% endblock %}
-          </select>
-        </div>
 
-        <div class="container-input">
-          <div class="wrapper data-hora">
-            <img src="{% static 'imagens/icone-relogio.png' %}" alt="icone relogio">
-            <label for="hour_form">Hora</label>
-          </div>
-          <select class="form-select" aria-label="Default select example" id="hour_form" name="hour_form"
-            style="width: fit-content;" onclick="atualizar_url1()" onload="selecionarHora()">
-            {% block 'hours_form' %}{% endblock %}
-          </select>
-        </div>
-      </fieldset>
 
-      <fieldset>
-        <legend>Configuração Cores</legend>
-        <div class="configuracao">
-          <div class="container-cores">
-            <div class="container-input">
-              <label for="vermelho">Vermelho:</label>
-              <div class="wrapper">
-                <img src="{% static 'imagens/Ellipse-vermelho.png' %}" alt="">
-                <input type="text" id="vermelho" name="vermelho">
-              </div>
-              
-            </div>
-            <div class="container-input">
-              <label for="laranja">Laranja:</label>
-              <div class="wrapper">
-                <img src="{% static 'imagens/Ellipse-laranja.png' %}" alt="">
-                <input type="text" id="laranja" name="laranja">
-              </div>
-            </div>
-            <div class="container-input">
-              <label for="amarelo">Amarelo:</label>
-              <div class="wrapper">
-                <img src="{% static 'imagens/Ellipse-amarelo.png' %}" alt="">
-                <input type="text" id="amarelo" name="amarelo">
-              </div>
-            </div>
-            <div class="container-input">
-              <label for="azul">Azul:</label>
-              <div class="wrapper">
-                <img src="{% static 'imagens/Ellipse-azul.png' %}" alt="">
-                <input type="text" id="azul" name="azul">
-              </div>
-            </div>
-            <div class="container-input">
-              <label for="verde">Verde:</label>
-              <div class="wrapper">
-                <img src="{% static 'imagens/Ellipse-verde.png' %}" alt="">
-                <input type="text" id="verde" name="verde" disabled value="Verde < Azul">
-              </div>
-            </div>
-          </div>
-          {% block 'colorConfiguration' %}{% endblock %}
-          <button class="botao" onclick="atualizarCores()">Atualizar cores</button>
-        </div>
-      </fieldset>
 
-      <fieldset>
-        <legend>Veículos</legend>
-        <div class="wrapper v">
-          <input type="checkbox" name="carros" id="carros">
-          <p>Carros</p>
-        </div>
-        <div class="wrapper v">
-          <input type="checkbox" name="motos" id="motos">
-          <p>Motos</p>
-        </div>
-        <div class="wrapper v">
-          <input type="checkbox" name="vans" id="vans" disabled>
-          <p>Vans</p>
-        </div>
-        <div class="wrapper v">
-          <input type="checkbox" name="caminhoes" id="caminhoes" disabled>
-          <p>Caminhões</p>
-        </div>
-        <div class="wrapper v">
-          <input type="checkbox" name="onibus" id="onibus" disabled>
-          <p>Onibus</p>
-        </div>
-      </fieldset>
+          {% block 'data' %}{% endblock %}
 
-      <button class="botao" onclick="atualizarMapaComParametros()">Atualizar</button>
-    </div>
+        
+
+
+
+          {% block 'filtro_data' %} {% endblock %}
+
+ 
+
+      {% block 'colorConfiguration' %}{% endblock %}
+
+
+      {% block 'filtro_veiculos' %}{% endblock %}
+     
 
     {% block 'dashboard1' %}{% endblock %}
   </div>
 
-  <div id="colocar_valor"></div>
+  
 
   <script>
     document.addEventListener("DOMContentLoaded", function () {

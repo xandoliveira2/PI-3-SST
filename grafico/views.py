@@ -193,7 +193,7 @@ def density_map_view(request):
     grafico_html = plot(density_map,output_type='div')
  
     
-    return render(request, 'density_map.html',{'grafico_html':grafico_html})
+    return render(request, 'base.html',{'grafico_html':grafico_html})
 
 # def update_map(request):
 #     filtro_data = request.GET.get('param1')
