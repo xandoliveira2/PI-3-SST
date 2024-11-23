@@ -101,6 +101,13 @@ def enviar_coluna_data(request):
    
     return JsonResponse({'dados':coluna_dados})
 
+def enviar_coluna_rua(request):
+    data = request.GET.get('param1')
+    
+    coluna_rua = df[df['data'] == data]['rua'].unique().tolist()
+
+    return JsonResponse({'ruas':coluna_rua})
+
 def enviar_coluna_horarios(request):
     data = request.GET.get('param1')
     horas = df[df['data']==data]['horario'].unique().tolist()
@@ -114,7 +121,9 @@ def density_map_view(request):
     print(contadorPagina)
     filtro_data = request.GET.get('param1')
     filtro_hora = request.GET.get('param2')
-    filtro_veiculos = request.GET.get('param3', 'carros motos')  # Default para 'carros motos'
+    filtro_veiculos = request.GET.get('param3')#('param3', 'carros motos')  # Default para 'carros motos'
+    ruas = request.GET.get('ruas')
+    ruas = ruas.split(',') if ruas else []
 
     filtro_veiculos = filtro_veiculos.split()
     while '' in filtro_veiculos:
@@ -167,7 +176,7 @@ def density_map_view(request):
     with open(file_path, 'w') as jsonFile:
         json.dump(data, jsonFile, indent=4)
     
- 
+    df_filtered1 = df_filtered1[df_filtered1['rua'].isin(ruas)] #<-- essa linha daqui 
     density_map = pe.scatter_mapbox(
         df_filtered1,
         lat='latitude_atualizada',

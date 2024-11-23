@@ -27,7 +27,7 @@
     </div>
   </fieldset>
 
-  <button class="botao" onclick="atualizarMapaComParametros()">Atualizar</button>
+  <button class="botao" onclick="atualizarMapaComParametros();atualizar_rua()">Atualizar</button> 
 </div>
 {% endblock %}
 
@@ -203,10 +203,13 @@ if (document.getElementById("onibus").checked){
 }
 
 
-filtros = filtros.trim(); // Remove o espaço ou '%20' extra no final, se houver
-
+filtros = filtros.trim(); // Remove o espaço ou '%20' extra no final, se houver 
+const elemento = document.getElementById('ruas');
+const ruas = Array.from(elemento.selectedOptions).map(option => option.value)
+    // 
+    // const printar = 
 // Criação da URL
-const url = `http://localhost:8000/grafico/density-map/?param1=${data}&param2=${hora}&param3=${filtros}`;
+const url = `http://localhost:8000/grafico/density-map/?param1=${data}&param2=${hora}&param3=${filtros}&ruas=${ruas}`;
 window.location.href = url;
 
 
@@ -247,6 +250,7 @@ window.location.href = url;
 
 
 {% block 'colorConfiguration' %}
+
 <script>
     const url_atual = window.location.href
     if (!url_atual.includes("param1") || !url_atual.includes("param2") || !url_atual.includes("param3")) {
@@ -361,18 +365,57 @@ window.location.href = url;
 {% block 'filtro_rua' %}
 
 
-<select name="ruas" id="ruas" class="form-control" multiple >
+<select name="ruas" id="ruas" class="form-control" multiple style="display: none;" onclick="atualizar_rua()">
 
-    <option value="">a</option>
-    <option value="">b</option>
-    <option value="">c</option>
-    <option value="">d</option>
-    <option value="">e</option>
-    <option value="">f</option>
-    <option value="">g</option>
-    <option value="">h</option>
-    <option value="">i</option>
-    <option value="">j</option>
+ <script>
+      
+
+    
+    // const elemento = document.getElementById('ruas');
+    // const printar = Array.from(elemento.selectedOptions).map(option => option.value)
+  
+    
+
+ 
+   
+    const urlParams = new URLSearchParams(window.location.search);
+    console.log(urlParams)
+
+
+    const param1 = urlParams.get('param1');
+
+
+
+    fetch(`/grafico/density-map/ruas?param1=${param1}`).then(response => response.json()).then(dados =>{
+        select_ruas = document.getElementById('ruas')
+        dados.ruas.forEach(item => {
+            const option = document.createElement('option');
+            option.value = item;      
+            option.textContent = item; 
+            option.selected = true;
+            select_ruas.appendChild(option); 
+        });
+    })
+    function atualizar_rua(){
+        const urlParams = new URLSearchParams(window.location.search);
+    console.log(urlParams)
+
+
+    const param1 = urlParams.get('param1');
+
+
+
+    fetch(`/grafico/density-map/ruas?param1=${param1}`).then(response => response.json()).then(dados =>{
+        select_ruas = document.getElementById('ruas')
+        dados.ruas.forEach(item => {
+            const option = document.createElement('option');
+            option.value = item;      
+            option.textContent = item; 
+            option.selected = true;
+            select_ruas.appendChild(option); 
+        });
+    })}
+ </script>
 
 </select>
 
