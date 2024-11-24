@@ -246,7 +246,7 @@ if (document.getElementById("onibus").checked){
 filtros = filtros.trim(); // Remove o espaço ou '%20' extra no final, se houver 
 const elemento = document.getElementById('ruas');
 const ruas = Array.from(elemento.selectedOptions).map(option => option.value)
-if(!ruas || ruas === ""){
+if(!ruas || ruas.length === 0){
     alert('Selecione pelo menos 1 rua')
 }
 else{
