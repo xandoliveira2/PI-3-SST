@@ -265,3 +265,15 @@ def pagRelatorio(request):
 
 def login_view(request):
     return render(request, 'login.html')
+
+
+
+
+
+
+
+
+
+
+
+

@@ -1,8 +1,9 @@
-{% extends 'base.html' %} 
+{% extends 'base.html' %}
 {% load static %}
 
 
-    {% block 'data' %} <div class="container">
+    {% block 'data' %}
+     <div class="container">
         <div class="container-filtros">
           <div class="titulo-filtro">
             <img src="{% static 'imagens/icone-filtro.png' %}" alt="icone filtro">
@@ -19,18 +20,25 @@
     style="width: fit-content;" onclick="atualizar_url1(); atualizar_horarios()">
     <script>
     
-        fetch('/grafico/density-map/requisicao').then(response => response.json()).then( //http://localhost:8000/grafico/density-map/requisicao
-            data => { 
-                const select_dia = document.getElementById('data_form');
-                data.dados.forEach(item => {
-                            const option = document.createElement('option');
-                            option.value = item;      
-                            option.textContent = item; 
-                            select_dia.appendChild(option); 
-                        });
-                    }).catch(
-                        error => console.error('Erro:', error));
-        
+    async function carregarOpcoes() {
+    try {
+        const response = await fetch('/grafico/density-map/requisicao'); // Faz a requisição
+        const data = await response.json(); // Converte a resposta para JSON
+
+        const select_dia = document.getElementById('data_form');
+        data.dados.forEach(item => {
+            const option = document.createElement('option');
+            option.value = item;
+            option.textContent = item;
+            select_dia.appendChild(option);
+        });
+    } catch (error) {
+        console.error('Erro:', error); // Trata erros da requisição
+    }
+}
+
+// Chama a função
+carregarOpcoes();
         
         </script>
     </select>
@@ -219,7 +227,7 @@ window.location.href = url;
     </div>
   </fieldset>
 
-  <button class="botao" onclick="atualizarMapaComParametros();atualizar_rua()">Atualizar</button> 
+  <button class="botao" onclick="atualizarMapaComParametros();">Atualizar</button> 
 </div>
 {% endblock %}
 
@@ -238,44 +246,62 @@ window.location.href = url;
 {% block 'filtro_rua' %}
 <script>
     function mudarRuas(){
-        var urlAtual = window.location.href
-        window.location.href = urlAtual
+        // var urlAtual = window.location.href
+        // window.location.href = urlAtual
     }
 
 
 </script>
-<select name="ruas" id="ruas" class="form-control" multiple style="display: none;" onclick="">
-</select>
+<select name="ruas" id="ruas" class="form-control" ></select>
+
 <script>
+document.addEventListener("DOMContentLoaded", function () {
+    const select_ruas = document.getElementById('ruas');
+    if (!select_ruas) {
+        console.error('Elemento com id "ruas" não encontrado.');
+        return;
+    }
+
     const urlParams = new URLSearchParams(window.location.search);
     const param1 = urlParams.get('param1');
-    
-    fetch(`/grafico/density-map/ruas?param1=${param1}`).then(response => response.json()).then(dados =>{
-        select_ruas = document.getElementById('ruas')
-        dados.ruas.forEach(item => {
-            const option = document.createElement('option');
-            option.value = item;      
-            option.textContent = item; 
-            option.selected = true;
-            select_ruas.appendChild(option); 
-        });
-    })
-    window.addEventListener("load", function () {
-    const url_atual = window.location.href;
-    if (url_atual.includes("param1")) {
-        const urlParams = new URLSearchParams(window.location.search);
-        const param1Value = urlParams.get("param1");
-        const dataForm = document.getElementById('data_form');
-        if (dataForm) {
-            dataForm.value = param1Value;
-        } else {
-            console.error("Elemento 'data_form' não encontrado.");
-        }
+
+    if (param1) {
+        fetch(`/grafico/density-map/ruas?param1=${param1}`)
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`Erro na API: ${response.status} - ${response.statusText}`);
+                }
+                return response.json();
+            })
+            .then(dados => {
+                if (!dados.ruas || !Array.isArray(dados.ruas)) {
+                    throw new Error('Resposta da API inesperada: "ruas" ausente ou não é uma lista.');
+                }
+
+                select_ruas.innerHTML = ''; // Limpa opções antigas
+
+                // Adiciona opções ao <select>
+                dados.ruas.forEach(item => {
+                    const option = document.createElement('option');
+                    option.value = item;
+                    option.textContent = item;
+                    select_ruas.appendChild(option);
+                });
+
+                // Torna o <select> visível se houver opções
+                if (dados.ruas.length > 0) {
+                    select_ruas.style.display = 'block';
+                }
+            })
+            .catch(error => console.error('Erro ao buscar dados:', error));
+    } else {
+        console.warn('O parâmetro "param1" não foi encontrado na URL.');
     }
 });
- </script>
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
 
+</script>
 
 {% endblock %}
+
+

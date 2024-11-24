@@ -27,7 +27,7 @@
 
 
   <nav style="width: 100%;display: flex;justify-content: space-between;align-items: center;padding-right: 50px;">
-    <img src="{% static 'imagens/logo.png' %}" alt="Logo">
+    <img src="{% static 'imagens/carflow.svg' %}" alt="Logo" style="width: 100px;filter: invert(1);">
     
       <a href="/grafico/density-map/">
         <li>Gráfico</li>
@@ -135,7 +135,7 @@
       document.addEventListener("DOMContentLoaded", ()=> {
      new MultiSelectTag('ruas', {
         rounded: true,    // default true
-        shadow: true,      // default false
+        shadow: false,      // default false
         placeholder: 'Search',  // default Search...
         tagColor: {
             textColor: '#327b2c',
