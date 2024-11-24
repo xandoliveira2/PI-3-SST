@@ -127,6 +127,18 @@ legend {
   height: 20px;
 
 }
+.container-dataHora{
+  display: flex;
+  flex-direction: row;
+}
+
+.dataHora{
+  display: flex;
+}
+.container-filtroDataHora{
+  display: flex;
+  flex-direction: column;
+}
 
 
 /* Veiculos */
@@ -141,12 +153,39 @@ legend {
   flex-wrap: wrap;
 }
 .container-cores input[type="text"]{
+  display: inline-block;
   border: 1px rgb(198, 198, 198) solid;
   border-radius: 5px;
   margin-left: 2px;
   height: 30px;
 }
-/* Ruas */
+
+.container-cores .wrapper::before{
+  content: "";
+  width: 30px;
+  height: 30px;
+  border-radius: 100%;
+  background-color: #000000;
+  margin-right: 2px;
+}
+
+.container-cores .wrapper.vermelho::before{
+  background-color: #b50f0f;
+}
+.container-cores .wrapper.laranja::before{
+  background-color: #ea8c1f;
+}
+.container-cores .wrapper.amarelo::before{
+  background-color: #ced71c;
+}
+.container-cores .wrapper.azul::before{
+  background-color: #0f68b5;
+}
+.container-cores .wrapper.verde::before{
+  background-color: #0fb539;
+}
+
+  /* Ruas */
 .botao[onclick="mudarRuas()"]{
   margin-top: 15px;
 }

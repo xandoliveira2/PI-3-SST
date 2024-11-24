@@ -50,14 +50,11 @@
 
 
 {% block 'data' %}
-<div class="container">
-    <div class="container-filtros">
-      <div class="titulo-filtro">
-        <img src="{% static 'imagens/icone-filtro.png' %}" alt="icone filtro">
-        <h3>Filtros</h3>
-      </div>
-<fieldset>
+
+<fieldset class="container-filtroDataHora">
     <legend>Data/Hora</legend>
+  <div class="container-dataHora">
+
     <div class="container-input">
       <div class="wrapper dataHora">
         <img src="{% static 'imagens/icone-calendario.png' %}" alt="icone calendario">
@@ -101,13 +98,16 @@ style="width: fit-content;" onclick="atualizar_url1(); atualizar_horarios()">
 
 
 {% block 'filtro_data' %}
+
 <div class="container-input">
     <div class="wrapper data-hora">
       <img src="{% static 'imagens/icone-relogio.png' %}" alt="icone relogio">
       <label for="hour_form">Hora</label>
     </div>
+
 <select class="form-select" aria-label="Default select example" id="hour_form" name="hour_form"
 style="width: fit-content;" onclick="atualizar_url1()" onload="selecionarHora()">
+
 <script>
     document.addEventListener("DOMContentLoaded", evento =>{
         let ajaxExecuted = false;
@@ -281,8 +281,16 @@ window.location.href = url;
     </script>
 
 </select>
+
+
 </div>
+  
+</div>
+<button class="botao" onclick="mudarRuas()">Atualizar ruas</button>
+
+
 </fieldset>
+
 {% endblock %}
 
 
@@ -373,7 +381,6 @@ window.location.href = url;
   <legend>Ruas</legend>
   <select name="ruas" id="ruas" class="form-control" multiple style="display: none;" onclick="">
 </select>
-<button class="botao" onclick="mudarRuas()">Atualizar ruas</button>
 
 </fieldset>
 
@@ -486,37 +493,32 @@ window.location.href = url;
       <div class="container-cores">
         <div class="container-input">
           <label for="vermelho">Vermelho:</label>
-          <div class="wrapper">
-            <img src="{% static 'imagens/Ellipse-vermelho.png' %}" alt="">
+          <div class="wrapper vermelho">
             <input type="text" id="vermelho" name="vermelho">
           </div>
           
         </div>
         <div class="container-input">
           <label for="laranja">Laranja:</label>
-          <div class="wrapper">
-            <img src="{% static 'imagens/Ellipse-laranja.png' %}" alt="">
+          <div class="wrapper laranja">
             <input type="text" id="laranja" name="laranja">
           </div>
         </div>
         <div class="container-input">
           <label for="amarelo">Amarelo:</label>
-          <div class="wrapper">
-            <img src="{% static 'imagens/Ellipse-amarelo.png' %}" alt="">
+          <div class="wrapper amarelo">
             <input type="text" id="amarelo" name="amarelo">
           </div>
         </div>
         <div class="container-input">
           <label for="azul">Azul:</label>
-          <div class="wrapper">
-            <img src="{% static 'imagens/Ellipse-azul.png' %}" alt="">
+          <div class="wrapper azul">
             <input type="text" id="azul" name="azul">
           </div>
         </div>
         <div class="container-input">
           <label for="verde">Verde:</label>
-          <div class="wrapper">
-            <img src="{% static 'imagens/Ellipse-verde.png' %}" alt="">
+          <div class="wrapper verde">
             <input type="text" id="verde" name="verde" disabled value="Verde < Azul">
           </div>
         </div>

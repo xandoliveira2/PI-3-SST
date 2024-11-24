@@ -48,24 +48,28 @@
     
   </nav>
 
+  <div class="container">
+    <div class="container-filtros">
+      <div class="titulo-filtro">
+        <img src="{% static 'imagens/icone-filtro.png' %}" alt="icone filtro">
+        <h3>Filtros</h3>
+      </div>
+
+      {% block 'colorConfiguration' %}{% endblock %}
+      {% block 'data' %}{% endblock %}
+      {% block 'filtro_data' %} {% endblock %}
+
+      {% block 'filtro_rua' %}{% endblock %}
 
 
-
-          {% block 'data' %}{% endblock %}
-
-        
-
-
-
-          {% block 'filtro_data' %} {% endblock %}
+       
 
  
 
-      {% block 'colorConfiguration' %}{% endblock %}
 
 
       {% block 'filtro_veiculos' %}{% endblock %}
-       {% block 'filtro_rua' %}{% endblock %}
+
        <button class="botao" onclick="atualizarMapaComParametros();atualizar_rua()">Atualizar</button> 
 
 
