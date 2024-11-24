@@ -102,7 +102,7 @@ loginForm.addEventListener('submit', async (e) => {
     const isValid = await validateLogin(username, password);
 
     if (isValid) {
-        window.location.href = '/grafico/density-map/?param1=01/12/2024&param2=00:00&param3=carros%20motos%20&ruas=Tereza%20Lera%20Paoletti'; 
+        window.location.href = '/grafico/home/'; 
     } else {
         errorMessage.textContent = 'Usuário ou senha inválidos!';
     }
