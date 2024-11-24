@@ -10,7 +10,7 @@ urlpatterns = [
     path('density-map/receber-dado/',recebe_data, name='recebe_data'),
     #path('mapa_fetch/',update_map, name='update_map'),
     path('density-map/requisicao/horarios',enviar_coluna_horarios,name='enviar_coluna_horarios'),
-    path('relatorio',pagRelatorio,name='pagRelatorio'),
+    path('relatorio/',pagRelatorio,name='pagRelatorio'),
     path('density-map/ruas',enviar_coluna_rua,name='enviarColunaRua'),
     
     # path('login/',login_view, name='login')  # Rota para login

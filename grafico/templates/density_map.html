@@ -456,7 +456,49 @@ window.location.href = url;
 
 
 {% block 'colorConfiguration' %}
+<script>
+     document.addEventListener("DOMContentLoaded", function () {
+      const url_atual = window.location.href;
+      if (url_atual.includes("param1")) {
+        const urlParams = new URLSearchParams(window.location.search);
 
+        const param1Value = urlParams.get("param1");
+        const param2Value = urlParams.get("param2");
+        let param3value = urlParams.get("param3");
+        if (param3value) {
+          param3value = param3value.trim()
+          let arraysplit = param3value.split(" ");
+          arraysplit.forEach(element => {
+            if (element) {
+              switch (element) {
+                case "carros":
+                  document.getElementById(element).checked = true;
+                  break;
+                case "motos":
+                  document.getElementById(element).checked = true;
+                  break;
+                case "vans":
+                  document.getElementById(element).checked = true;
+                  break;
+                case "caminhoes":
+                  document.getElementById(element).checked = true;
+                  break;
+                case "onibus":
+                  document.getElementById(element).checked = true;
+                  break;
+                default:
+                  break;
+              }
+            }
+          });
+        }
+
+        document.getElementById('data_form').value = param1Value;
+        atualizar_horarios()
+        document.getElementById('hour_form').value = param2Value;
+      }
+    })
+</script>
 <script>
     const url_atual = window.location.href
     if (!url_atual.includes("param1") || !url_atual.includes("param2") || !url_atual.includes("param3")){ //|| !url_atual.includes("ruas")) {

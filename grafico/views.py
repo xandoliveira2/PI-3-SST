@@ -172,7 +172,7 @@ def density_map_view(request):
     filtro_veiculos = request.GET.get('param3', 'carros motos')#('param3', 'carros motos')  # Default para 'carros motos'
     ruas = request.GET.get('ruas')
     ruas = ruas.split(',') if ruas else []
-    print(ruas)
+    
 
     filtro_veiculos = filtro_veiculos.split()
     while '' in filtro_veiculos:

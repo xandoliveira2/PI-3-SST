@@ -1,12 +1,281 @@
-{% extends 'base.html' %}
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
-</head>
-<body>
+{% extends 'base.html' %} 
+{% load static %}
+
+
+    {% block 'data' %} <div class="container">
+        <div class="container-filtros">
+          <div class="titulo-filtro">
+            <img src="{% static 'imagens/icone-filtro.png' %}" alt="icone filtro">
+            <h3>Filtros</h3>
+          </div>
+    <fieldset>
+        <legend>Data/Hora</legend>
+        <div class="container-input">
+          <div class="wrapper dataHora">
+            <img src="{% static 'imagens/icone-calendario.png' %}" alt="icone calendario">
+            <label for="data_form">Data</label>
+          </div>
+    <select class="form-select" aria-label="Default select example" id="data_form" name="data_form" onload="atualizar_url1()"
+    style="width: fit-content;" onclick="atualizar_url1(); atualizar_horarios()">
+    <script>
     
-</body>
-</html>
+        fetch('/grafico/density-map/requisicao').then(response => response.json()).then( //http://localhost:8000/grafico/density-map/requisicao
+            data => { 
+                const select_dia = document.getElementById('data_form');
+                data.dados.forEach(item => {
+                            const option = document.createElement('option');
+                            option.value = item;      
+                            option.textContent = item; 
+                            select_dia.appendChild(option); 
+                        });
+                    }).catch(
+                        error => console.error('Erro:', error));
+        
+        
+        </script>
+    </select>
+    <button onclick="mudarRuas()">Atualizar ruas</button>
+    </div> {% endblock %}
+
+
+
+
+
+
+
+
+
+
+    {% block 'filtro_data' %}
+    
+      
+<script>
+    document.addEventListener("DOMContentLoaded", evento =>{
+        let ajaxExecuted = false;
+     
+        const data= document.getElementById('data_form').value; 
+
+      
+        const urlParams = new URLSearchParams(window.location.search);
+
+
+    fetch(`/grafico/density-map/requisicao/horarios?param1=${data}`)
+    .then(response => {
+        if (!response.ok) {
+            throw new Error(`Erro na rede: ${response.statusText}`);
+        }
+        return response.json();
+    })
+    .then(data => { 
+        
+        select_hora = document.getElementById('hour_form');
+        
+        data.horas.forEach(item => {
+            const option = document.createElement('option');
+            option.value = item;      
+            option.textContent = item; 
+            select_hora.appendChild(option); 
+        });
+        
+      
+       
+          
+        const data1= document.getElementById('data_form').value; 
+        const url = `/grafico/density-map/?param1=${data1}`;
+        
+
+    })
+    .catch(error => console.error('Erro:', error));
+    
+});
+
+
+    function atualizar_horarios(){
+        const urlParams = new URLSearchParams(window.location.search);
+        
+        const data_formulario = document.getElementById('data_form').value;
+        fetch(`/grafico/density-map/requisicao/horarios?param1=${data_formulario}`)
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(`Erro na rede: ${response.statusText}`);
+            }
+            return response.json();
+        })
+    }
+
+      
+        
+        
+    function atualizar_url1(){
+        
+   $('#data_form').click(function() {
+    const dado = document.getElementById('data_form').value;  
+  
+
+    // Obtém a URL atual
+    const urlAtual = new URL(window.location.href);
+
+    // Atualiza ou adiciona os parâmetros na URL
+    urlAtual.searchParams.set('param1', dado);
+    const finalUrl = urlAtual.toString().replace(/%2F/g, '/');
+
+    // Faz a requisição Ajax
+    $.ajax({
+        url: `/grafico/density-map/?${finalUrl}`,
+        type: 'GET',
+        success: function(response) {
+            // Atualiza a URL no navegador sem recarregar a página
+            window.history.pushState({path: finalUrl}, '', finalUrl);
+        },
+        error: function(xhr, status, error) {
+            console.error("Erro:", error);
+        }
+    });
+});
+
+}
+      
+    
+    </script>
+<script> function atualizarMapaComParametros(){
+    if (!document.getElementById("carros").checked &&
+    !document.getElementById("motos").checked&&
+    !document.getElementById("vans").checked &&
+    !document.getElementById("caminhoes").checked &&
+    !document.getElementById("onibus").checked){
+        alert("Selecione ao menos 1 tipo de veículo")
+    }  else {
+
+
+    const data = document.getElementById('data_form').value;
+    let filtros = "";
+if (document.getElementById("carros").checked){
+filtros += document.getElementById("carros").id + '%20'; 
+}
+if (document.getElementById("motos").checked){
+filtros += document.getElementById("motos").id + '%20';
+}
+if (document.getElementById("vans").checked){
+filtros += document.getElementById("vans").id + '%20';
+}
+if (document.getElementById("caminhoes").checked){
+filtros += document.getElementById("caminhoes").id + '%20';
+}
+if (document.getElementById("onibus").checked){
+filtros += document.getElementById("onibus").id + '%20';
+}
+
+
+filtros = filtros.trim(); // Remove o espaço ou '%20' extra no final, se houver 
+const elemento = document.getElementById('ruas');
+const ruas = Array.from(elemento.selectedOptions).map(option => option.value)
+alert(ruas)
+if(!ruas || ruas.length === 0){
+alert('Selecione pelo menos 1 rua')
+}
+else{
+const url = `http://localhost:8000/grafico/relatorio/?param1=${data}&param3=${filtros}&ruas=${ruas}`;
+window.location.href = url;
+}
+    }}
+
+</script>
+
+</select>
+</div>
+</fieldset>
+
+{% endblock %}
+
+
+
+
+
+
+
+
+{% block 'filtro_veiculos' %}
+<fieldset>
+    <legend>Veículos</legend>
+    <div class="wrapper v">
+      <input type="checkbox" name="carros" id="carros">
+      <p>Carros</p>
+    </div>
+    <div class="wrapper v">
+      <input type="checkbox" name="motos" id="motos">
+      <p>Motos</p>
+    </div>
+    <div class="wrapper v">
+      <input type="checkbox" name="vans" id="vans" disabled>
+      <p>Vans</p>
+    </div>
+    <div class="wrapper v">
+      <input type="checkbox" name="caminhoes" id="caminhoes" disabled>
+      <p>Caminhões</p>
+    </div>
+    <div class="wrapper v">
+      <input type="checkbox" name="onibus" id="onibus" disabled>
+      <p>Onibus</p>
+    </div>
+  </fieldset>
+
+  <button class="botao" onclick="atualizarMapaComParametros();atualizar_rua()">Atualizar</button> 
+</div>
+{% endblock %}
+
+
+
+
+
+
+
+
+
+
+
+
+
+{% block 'filtro_rua' %}
+<script>
+    function mudarRuas(){
+        var urlAtual = window.location.href
+        window.location.href = urlAtual
+    }
+
+
+</script>
+<select name="ruas" id="ruas" class="form-control" multiple style="display: none;" onclick="">
+</select>
+<script>
+    const urlParams = new URLSearchParams(window.location.search);
+    const param1 = urlParams.get('param1');
+    
+    fetch(`/grafico/density-map/ruas?param1=${param1}`).then(response => response.json()).then(dados =>{
+        select_ruas = document.getElementById('ruas')
+        dados.ruas.forEach(item => {
+            const option = document.createElement('option');
+            option.value = item;      
+            option.textContent = item; 
+            option.selected = true;
+            select_ruas.appendChild(option); 
+        });
+    })
+    window.addEventListener("load", function () {
+    const url_atual = window.location.href;
+    if (url_atual.includes("param1")) {
+        const urlParams = new URLSearchParams(window.location.search);
+        const param1Value = urlParams.get("param1");
+        const dataForm = document.getElementById('data_form');
+        if (dataForm) {
+            dataForm.value = param1Value;
+        } else {
+            console.error("Elemento 'data_form' não encontrado.");
+        }
+    }
+});
+ </script>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+
+
+{% endblock %}
