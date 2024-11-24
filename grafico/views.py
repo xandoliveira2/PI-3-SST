@@ -12,6 +12,54 @@ import plotly.graph_objs as go
 import numpy as np
 import os
 from django.conf import settings
+import requests
+from time import sleep
+def tudoNumerico(palavra:str):
+    palavra = str(palavra)
+    for i in palavra:
+        if not i.isdigit():
+            return False
+    return True
+
+def obter_endereco_por_cep(cep):
+    try:
+        if tudoNumerico(cep):
+            url = f"https://viacep.com.br/ws/{cep}/json/"
+            resposta = requests.get(url,timeout=0.1)
+        elif '-' in cep:
+            cep = cep.replace("-", "")
+            url = f"https://viacep.com.br/ws/{cep}/json/"
+            resposta = requests.get(url,timeout=0.1)
+        else:
+            return cep
+        if resposta.status_code == 200:
+            dados = resposta.json()
+            if "erro" in dados:
+                return f"CEP {cep} não encontrado."
+
+            return dados.get("logradouro", "Rua não encontrada.")
+        else:
+            return "Erro ao buscar dados."
+    except:
+        print('entrou no except de erro na API')
+        try:
+            # Verifique se cep é uma string numérica válida antes de tentar converter
+            cep_int = int(cep)  # strip() para remover espaços em branco
+            dicionario = {
+                13974503: "Avenida Castro Alves",
+                13974080: "Tereza Lera Paoletti",
+            }
+            print(cep_int,'  < --cep int')
+            return dicionario.get(cep_int,'CEP não encontrado no bd')
+        except Exception as e:
+            print('entrou no except 2, mas aqui nao vejo motivo p quebrar')
+            print(e, '<--erro')
+            # Caso não consiga converter para inteiro, retorne uma mensagem de erro
+            return e
+    
+def obter_endereco_delay(cep):
+    return obter_endereco_por_cep(cep)
+   
 
 def hours_to_decimals_convertion(formato:str):
     """
@@ -66,8 +114,8 @@ def dcolor(value:int|float,valores:list) -> str:
     
     
 client = pm.MongoClient('mongodb://localhost:27017/')
-db = client['teste']
-collection = db['simlulandodados2']
+db = client['pi']
+collection = db['autoflow']
 df = pd.DataFrame(collection.find())
 df['latitude_atualizada'] = df['latitude'].apply(hours_to_decimals_convertion)
 df['longitude_atualizada'] = df['longitude'].apply(hours_to_decimals_convertion)
@@ -78,7 +126,8 @@ def aplicarCores(dataframe = df,ParametrosValores=[50,35,25,15]):
 
 
 
-df['identificador_rua'] = df['latitude_atualizada'].astype(str)+df['longitude_atualizada'].astype(str)
+df['rua'] = df['rua'].apply(obter_endereco_delay)
+print(df)
 df['data'] = pd.to_datetime(df['data'],format='%d/%m/%Y') 
 df['data'] = df['data'].dt.strftime('%d/%m/%Y') 
 df['size_column'] = df['total'].apply(lambda x: x if x != 0 else 0.1)
@@ -118,12 +167,12 @@ def enviar_coluna_horarios(request):
 contadorPagina = 0
 def density_map_view(request):
     global contadorPagina
-    print(contadorPagina)
     filtro_data = request.GET.get('param1')
     filtro_hora = request.GET.get('param2')
-    filtro_veiculos = request.GET.get('param3')#('param3', 'carros motos')  # Default para 'carros motos'
+    filtro_veiculos = request.GET.get('param3', 'carros motos')#('param3', 'carros motos')  # Default para 'carros motos'
     ruas = request.GET.get('ruas')
     ruas = ruas.split(',') if ruas else []
+    print(ruas)
 
     filtro_veiculos = filtro_veiculos.split()
     while '' in filtro_veiculos:
@@ -210,46 +259,7 @@ def density_map_view(request):
 
 def pagRelatorio(request):
     return render(request,'relatorio.html')
-
-# def update_map(request):
-#     filtro_data = request.GET.get('param1')
-#     filtro_hora = request.GET.get('param2')
-#     aplicarCores()
- 
-#     df_filtered1 = df[(df['horario']==filtro_hora) & (df['data'] == filtro_data)]
-#     df_filtered1['Total de veículos '] = df_filtered1   ['total'].apply(lambda x : f' {x}')
-#     # df_filtered1['Quantidade de carros '] = df_filtered1['motos'].apply(lambda x : f' {x}')
-#     # df_filtered1['Quantidade de motos '] = df_filtered1['carros'].apply(lambda x : f' {x}')
-#     df_filtered1['size_column'] = df_filtered1['total'].apply(lambda x: x if x != 0 else 0.1)
-
-#     # Cria o gráfico
-#     density_map = pe.scatter_mapbox(
-#         df_filtered1,
-#         lat='latitude_atualizada',
-#         lon='longitude_atualizada',
-#         mapbox_style="carto-darkmatter",
-#         center={'lat': -22.436491574441884, 'lon': -46.823405867130425},
-#         zoom=14,
-#         size='size_column',
-#         range_color=[10, 60],
-#         color_continuous_scale='Viridis',
-#         opacity=0.6,
-#         custom_data=['rua','total', 'motos', 'carros'],
-#         color='color',
-#         color_discrete_map={'red': 'red', 'blue': 'blue', 'green': 'green', 'orange': 'orange'},
-#     )
-#     density_map.update_traces(
-#     hovertemplate="<b> Rua</b>: %{customdata[0]}<br><b>?Total de veículos</b>: %{customdata[1]}<br><b>Quantidade de motos</b>: %{customdata[1]}<br><b>Quantidade de carros</b>: %{customdata[2]}<br><extra></extra>",
-#     )
-#     density_map.update_layout(showlegend=False)
-#     grafico_html = plot(density_map,output_type='div')
-#     # density_map_json = density_map.to_json()
-    
-  
-#     # return JsonResponse({'grafico_html':grafico_html})
-#     return render(request, 'fetch.html',{'grafico_html':grafico_html})
-
-# Create your views here
+# views here
 
 
 

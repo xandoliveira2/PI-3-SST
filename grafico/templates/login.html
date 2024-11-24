@@ -5,6 +5,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="shortcut icon" href="{% static 'imagens/favicon.svg' %}" type="image/x-icon">
+  
     <title>Login</title>
     <style>
         body {
@@ -100,7 +102,7 @@ loginForm.addEventListener('submit', async (e) => {
     const isValid = await validateLogin(username, password);
 
     if (isValid) {
-        window.location.href = '{% url "grafico:density_map_view" %}'; 
+        window.location.href = '/grafico/density-map/?param1=01/12/2024&param2=00:00&param3=carros%20motos%20&ruas=Tereza%20Lera%20Paoletti'; 
     } else {
         errorMessage.textContent = 'Usuário ou senha inválidos!';
     }

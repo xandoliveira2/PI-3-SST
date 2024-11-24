@@ -2,6 +2,16 @@
 {% load static %}
 
 
+
+
+
+
+
+
+
+
+
+
 {% block 'filtro_veiculos' %}
 <fieldset>
     <legend>Veículos</legend>
@@ -30,6 +40,15 @@
   <button class="botao" onclick="atualizarMapaComParametros();atualizar_rua()">Atualizar</button> 
 </div>
 {% endblock %}
+
+
+
+
+
+
+
+
+
 
 {% block 'data' %}
 <div class="container">
@@ -64,8 +83,24 @@ style="width: fit-content;" onclick="atualizar_url1(); atualizar_horarios()">
     
     </script>
 </select>
+<button onclick="mudarRuas()">Atualizar ruas</button>
 </div>
 {% endblock%}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 {% block 'filtro_data' %}
 <div class="container-input">
@@ -152,27 +187,32 @@ style="width: fit-content;" onclick="atualizar_url1()" onload="selecionarHora()"
         
     function atualizar_url1(){
         
-    $('#hour_form , #data_form').click(function() {
-                const dado = document.getElementById('data_form').value;  
-                const hora = document.getElementById('hour_form').value;
-              
-                const url = `/grafico/density-map/?param1=${dado}&param2=${hora}`  
-    
-                $.ajax({
-                    url: url,
-                    type: 'GET',
-                 
-                    success: function(response) {
-                        window.history.pushState({path : url},'',url)
-                    },
-                    error: function(xhr, status, error) {
-                     
-                        console.error("Erro:", error);
-                    }
-                });
-            });
-    
+   $('#hour_form , #data_form').click(function() {
+    const dado = document.getElementById('data_form').value;  
+    const hora = document.getElementById('hour_form').value;
+
+    // Obtém a URL atual
+    const urlAtual = new URL(window.location.href);
+
+    // Atualiza ou adiciona os parâmetros na URL
+    urlAtual.searchParams.set('param1', dado);
+    urlAtual.searchParams.set('param2', hora);
+
+    // Faz a requisição Ajax
+    $.ajax({
+        url: `/grafico/density-map/?${urlAtual.searchParams.toString()}`,
+        type: 'GET',
+        success: function(response) {
+            // Atualiza a URL no navegador sem recarregar a página
+            window.history.pushState({path: urlAtual.toString()}, '', urlAtual.toString());
+        },
+        error: function(xhr, status, error) {
+            console.error("Erro:", error);
         }
+    });
+});
+
+}
         function atualizarMapaComParametros(){
             if (!document.getElementById("carros").checked &&
             !document.getElementById("motos").checked&&
@@ -206,12 +246,13 @@ if (document.getElementById("onibus").checked){
 filtros = filtros.trim(); // Remove o espaço ou '%20' extra no final, se houver 
 const elemento = document.getElementById('ruas');
 const ruas = Array.from(elemento.selectedOptions).map(option => option.value)
-    // 
-    // const printar = 
-// Criação da URL
+if(!ruas || ruas === ""){
+    alert('Selecione pelo menos 1 rua')
+}
+else{
 const url = `http://localhost:8000/grafico/density-map/?param1=${data}&param2=${hora}&param3=${filtros}&ruas=${ruas}`;
 window.location.href = url;
-
+}
 
 // let arraysplit = filtros.split("%20");
 // console.log(arraysplit)
@@ -249,12 +290,170 @@ window.location.href = url;
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+{% block 'filtro_rua' %}
+<script>
+    function mudarRuas(){
+        var urlAtual = window.location.href
+        window.location.href = urlAtual
+    }
+</script>
+<!-- <select name="ruas" id="ruas" class="form-control" multiple style="display: none;" onclick="atualizar_rua()">
+
+ <script>
+      
+
+    
+    // const elemento = document.getElementById('ruas');
+    // const printar = Array.from(elemento.selectedOptions).map(option => option.value)
+  
+    
+
+ 
+   
+    const urlParams = new URLSearchParams(window.location.search);
+    console.log(urlParams)
+
+
+    const param1 = urlParams.get('param1');
+
+
+
+    fetch(`/grafico/density-map/ruas?param1=${param1}`).then(response => response.json()).then(dados =>{
+        select_ruas = document.getElementById('ruas')
+        dados.ruas.forEach(item => {
+            const option = document.createElement('option');
+            option.value = item;      
+            option.textContent = item; 
+            option.selected = true;
+            select_ruas.appendChild(option); 
+        });
+    })
+    function atualizar_rua(){
+        const urlParams = new URLSearchParams(window.location.search);
+    console.log(urlParams)
+
+
+    const param1 = urlParams.get('param1');
+
+
+
+    fetch(`/grafico/density-map/ruas?param1=${param1}`).then(response => response.json()).then(dados =>{
+        select_ruas = document.getElementById('ruas')
+        dados.ruas.forEach(item => {
+            const option = document.createElement('option');
+            option.value = item;      
+            option.textContent = item; 
+            option.selected = true;
+            select_ruas.appendChild(option); 
+        });
+    })}
+ </script>
+
+</select> -->
+<select name="ruas" id="ruas" class="form-control" multiple style="display: none;" onclick="">
+</select>
+
+<script>
+      
+
+    
+    // const elemento = document.getElementById('ruas');
+    // const printar = Array.from(elemento.selectedOptions).map(option => option.value)
+  
+    
+
+ 
+   
+    const urlParams = new URLSearchParams(window.location.search);
+    
+
+
+    const param1 = urlParams.get('param1');
+
+
+
+    fetch(`/grafico/density-map/ruas?param1=${param1}`).then(response => response.json()).then(dados =>{
+        select_ruas = document.getElementById('ruas')
+        dados.ruas.forEach(item => {
+            const option = document.createElement('option');
+            option.value = item;      
+            option.textContent = item; 
+            option.selected = true;
+            select_ruas.appendChild(option); 
+        });
+    })
+    function atualizar_rua(){
+        const urlParams = new URLSearchParams(window.location.search);
+    console.log(urlParams)
+
+
+    const param1 = urlParams.get('param1');
+
+
+
+    fetch(`/grafico/density-map/ruas?param1=${param1}`).then(response => response.json()).then(dados =>{
+        select_ruas = document.getElementById('ruas')
+        dados.ruas.forEach(item => {
+            const option = document.createElement('option');
+            option.value = item;      
+            option.textContent = item; 
+            option.selected = true;
+            select_ruas.appendChild(option); 
+        });
+    })}
+ </script>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+
+
+{% endblock %}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 {% block 'colorConfiguration' %}
 
 <script>
     const url_atual = window.location.href
-    if (!url_atual.includes("param1") || !url_atual.includes("param2") || !url_atual.includes("param3")) {
-      window.location.replace("http://localhost:8000/grafico/density-map/?param1=01/12/2024&param2=00:00&param3=carros%20motos%20");
+    if (!url_atual.includes("param1") || !url_atual.includes("param2") || !url_atual.includes("param3")){ //|| !url_atual.includes("ruas")) {
+    fetch(`/grafico/density-map/ruas?param1=01/12/2024`).then(response => response.json()).then( dado => { 
+        const dados =Array.isArray(dado.ruas) ? dado.ruas : [dado.ruas];
+        
+      window.location.replace(`http://localhost:8000/grafico/density-map/?param1=01/12/2024&param2=00:00&param3=carros%20motos%20&rua=${dados}`);
+    }
+    )
     }
   </script>
       <script>
@@ -362,67 +561,15 @@ window.location.href = url;
 {% endblock %}
 
 
-{% block 'filtro_rua' %}
-
-
-<select name="ruas" id="ruas" class="form-control" multiple style="display: none;" onclick="atualizar_rua()">
-
- <script>
-      
-
-    
-    // const elemento = document.getElementById('ruas');
-    // const printar = Array.from(elemento.selectedOptions).map(option => option.value)
-  
-    
-
- 
-   
-    const urlParams = new URLSearchParams(window.location.search);
-    console.log(urlParams)
-
-
-    const param1 = urlParams.get('param1');
-
-
-
-    fetch(`/grafico/density-map/ruas?param1=${param1}`).then(response => response.json()).then(dados =>{
-        select_ruas = document.getElementById('ruas')
-        dados.ruas.forEach(item => {
-            const option = document.createElement('option');
-            option.value = item;      
-            option.textContent = item; 
-            option.selected = true;
-            select_ruas.appendChild(option); 
-        });
-    })
-    function atualizar_rua(){
-        const urlParams = new URLSearchParams(window.location.search);
-    console.log(urlParams)
-
-
-    const param1 = urlParams.get('param1');
-
-
-
-    fetch(`/grafico/density-map/ruas?param1=${param1}`).then(response => response.json()).then(dados =>{
-        select_ruas = document.getElementById('ruas')
-        dados.ruas.forEach(item => {
-            const option = document.createElement('option');
-            option.value = item;      
-            option.textContent = item; 
-            option.selected = true;
-            select_ruas.appendChild(option); 
-        });
-    })}
- </script>
-
-</select>
 
 
 
 
-{% endblock %}
+
+
+
+
+
 
 
 
