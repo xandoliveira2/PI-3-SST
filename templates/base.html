@@ -11,7 +11,7 @@
   </style>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Bootstrap Demo</title>
+  <title>Autoflow</title>
   <link rel="shortcut icon" href="{% static 'imagens/favicon.svg' %}" type="image/x-icon">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/habibmhamadi/multi-select-tag@3.1.0/dist/css/multi-select-tag.css">
 
@@ -76,56 +76,61 @@
   
 
   <script>
-    document.addEventListener("DOMContentLoaded", function () {
-      if (url_atual.includes("param1") && url_atual.includes("param2")) {
-        const urlParams = new URLSearchParams(window.location.search);
+    // document.addEventListener("DOMContentLoaded", function () {
+    //   const url_atual = window.location.href;
+    //   if (url_atual.includes("param1")) {
+    //     const urlParams = new URLSearchParams(window.location.search);
 
-        const param1Value = urlParams.get("param1");
-        const param2Value = urlParams.get("param2");
-        let param3value = urlParams.get("param3");
-        if (param3value) {
-          param3value = param3value.trim()
-          let arraysplit = param3value.split(" ");
-          arraysplit.forEach(element => {
-            if (element) {
-              switch (element) {
-                case "carros":
-                  document.getElementById(element).checked = true;
-                  break;
-                case "motos":
-                  document.getElementById(element).checked = true;
-                  break;
-                case "vans":
-                  document.getElementById(element).checked = true;
-                  break;
-                case "caminhoes":
-                  document.getElementById(element).checked = true;
-                  break;
-                case "onibus":
-                  document.getElementById(element).checked = true;
-                  break;
-                default:
-                  break;
-              }
-            }
-          });
-        }
+    //     const param1Value = urlParams.get("param1");
+    //     const param2Value = urlParams.get("param2");
+    //     let param3value = urlParams.get("param3");
+    //     if (param3value) {
+    //       param3value = param3value.trim()
+    //       let arraysplit = param3value.split(" ");
+    //       arraysplit.forEach(element => {
+    //         if (element) {
+    //           switch (element) {
+    //             case "carros":
+    //               document.getElementById(element).checked = true;
+    //               break;
+    //             case "motos":
+    //               document.getElementById(element).checked = true;
+    //               break;
+    //             case "vans":
+    //               document.getElementById(element).checked = true;
+    //               break;
+    //             case "caminhoes":
+    //               document.getElementById(element).checked = true;
+    //               break;
+    //             case "onibus":
+    //               document.getElementById(element).checked = true;
+    //               break;
+    //             default:
+    //               break;
+    //           }
+    //         }
+    //       });
+    //     }
 
-        document.getElementById('data_form').value = param1Value;
-        atualizar_horarios()
-        document.getElementById('hour_form').value = param2Value;
-      }
-    })
+    //     document.getElementById('data_form').value = param1Value;
+    //     atualizar_horarios()
+    //     document.getElementById('hour_form').value = param2Value;
+    //   }
+    // })
   </script>
 
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
     integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
     crossorigin="anonymous"></script>
 
-    
+
     <script src="https://cdn.jsdelivr.net/gh/habibmhamadi/multi-select-tag@3.1.0/dist/js/multi-select-tag.js"></script>
 
     <script>
+
+
+
+
       document.addEventListener("DOMContentLoaded", ()=> {
      new MultiSelectTag('ruas', {
         rounded: true,    // default true
@@ -139,7 +144,40 @@
         onChange: function(values) {
             console.log(values)
         }
-    })})
+    })
+  
+    const selectElement = document.getElementById('data_form');
+  if (!selectElement) {
+    console.error('Elemento com id "data_form" não encontrado.');
+    return;
+  }
+
+  const urlParams = new URLSearchParams(window.location.search);
+  const paramData = urlParams.get('param1');
+
+  if (paramData) {
+    // Verifica se a opção já existe no select
+    let optionExists = false;
+    for (const option of selectElement.options) {
+      if (option.value === paramData) {
+        optionExists = true;
+        break;
+      }
+    }
+
+    // Adiciona a opção ao select se não existir
+    if (!optionExists) {
+      const newOption = document.createElement('option');
+      newOption.value = paramData;
+      newOption.textContent = paramData; // Texto visível no select
+      selectElement.appendChild(newOption);
+    }
+
+    // Define o valor do select
+    selectElement.value = paramData;
+  }
+
+  })
     </script>
 </body>
 
