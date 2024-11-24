@@ -49,7 +49,6 @@
   </nav>
 
 
-  {% block 'filtro_rua' %}{% endblock %}
 
 
           {% block 'data' %}{% endblock %}
@@ -66,7 +65,9 @@
 
 
       {% block 'filtro_veiculos' %}{% endblock %}
-     
+       {% block 'filtro_rua' %}{% endblock %}
+
+       <button class="botao" onclick="atualizarMapaComParametros();atualizar_rua()">Atualizar</button> 
 
     {% block 'dashboard1' %}{% endblock %}
 
@@ -141,6 +142,16 @@
         }
     })})
     </script>
+    <script>
+      window.onload = function() {
+      const divComShadow = document.querySelector(".wrapper .shadow");
+      if (divComShadow) {
+        divComShadow.classList.remove("shadow");
+      }
+    };
+    </script>
+    
+    
 </body>
 
 </html>
