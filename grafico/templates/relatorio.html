@@ -42,7 +42,7 @@ carregarOpcoes();
         
         </script>
     </select>
-    <button onclick="mudarRuas()">Atualizar ruas</button>
+    <button class="botao" onclick="mudarRuas()">Atualizar ruas</button>
     </div> {% endblock %}
 
 
@@ -230,7 +230,7 @@ window.location.href = url;
     </div>
   </fieldset>
 
-  <button class="botao" onclick="atualizarMapaComParametros();">Atualizar</button> 
+  <button class="botao" onclick="atualizarMapaComParametros();">Gerar Relatório</button> 
 </div>
 {% endblock %}
 
@@ -255,7 +255,11 @@ window.location.href = url;
 
 
 </script>
-<select name="rua" id="rua" class="form-control"></select>
+<fieldset>
+    <legend>Ruas</legend>
+    <select name="rua" id="rua" class="form-control"></select>
+
+</fieldset>
 
 <script>
     // Função para preencher o select com as ruas
