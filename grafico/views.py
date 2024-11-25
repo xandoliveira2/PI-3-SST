@@ -290,17 +290,21 @@ def gerarPDF(request):
         carros = dados['carros']
         motos = dados['motos']
         total = [c + m for c, m in zip(carros, motos)]
-
-        plt.figure(figsize=(10, 6))
+    
+        plt.figure(figsize=(12, 6))
         plt.plot(periodos, carros, marker='o', label='Carros', color='blue')
         plt.plot(periodos, motos, marker='o', label='Motos', color='orange')
         plt.plot(periodos, total, marker='o', label='Total', color='green', linestyle='--')
-        plt.title('Contagem de Veículos ao Longo do Tempo', fontsize=14)
-        plt.xlabel('Períodos', fontsize=12)
-        plt.ylabel('Quantidade', fontsize=12)
-        plt.legend()
+    
+        plt.title('Contagem de Veículos ao Longo do Tempo', fontsize=16)
+        plt.xlabel('Períodos', fontsize=14)
+        plt.ylabel('Quantidade', fontsize=14)
+        plt.xticks(rotation=45, fontsize=10)
+        plt.legend(fontsize=12)
         plt.grid(True)
-
+    
+        plt.tight_layout()
+    
         buffer = io.BytesIO()
         plt.savefig(buffer, format='png', bbox_inches='tight')
         buffer.seek(0)
