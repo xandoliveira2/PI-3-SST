@@ -146,6 +146,7 @@ carregarOpcoes();
     
     </script>
 <script> function atualizarMapaComParametros(){
+    
     if (!document.getElementById("carros").checked &&
     !document.getElementById("motos").checked&&
     !document.getElementById("vans").checked &&
@@ -154,7 +155,7 @@ carregarOpcoes();
         alert("Selecione ao menos 1 tipo de veículo")
     }  else {
 
-
+        
     const data = document.getElementById('data_form').value;
     let filtros = "";
 if (document.getElementById("carros").checked){
@@ -175,14 +176,15 @@ filtros += document.getElementById("onibus").id + '%20';
 
 
 filtros = filtros.trim(); // Remove o espaço ou '%20' extra no final, se houver 
-const elemento = document.getElementById('ruas');
-const ruas = Array.from(elemento.selectedOptions).map(option => option.value)
-alert(ruas)
-if(!ruas || ruas.length === 0){
+const elemento = document.getElementById('rua').value;
+
+
+if(!elemento || elemento === ''){
 alert('Selecione pelo menos 1 rua')
 }
 else{
-const url = `http://localhost:8000/grafico/relatorio/?param1=${data}&param3=${filtros}&ruas=${ruas}`;
+ 
+const url = `http://localhost:8000/grafico/relatorio/pdf?param1=${data}&param3=${filtros}&ruas=${elemento}`;
 window.location.href = url;
 }
     }}
@@ -246,60 +248,45 @@ window.location.href = url;
 {% block 'filtro_rua' %}
 <script>
     function mudarRuas(){
-        // var urlAtual = window.location.href
-        // window.location.href = urlAtual
+        var urlAtual = window.location.href
+        window.location.href = urlAtual
     }
 
 
 </script>
-<select name="ruas" id="ruas" class="form-control" ></select>
+<select name="rua" id="rua" class="form-control"></select>
 
 <script>
-document.addEventListener("DOMContentLoaded", function () {
-    const select_ruas = document.getElementById('ruas');
-    if (!select_ruas) {
-        console.error('Elemento com id "ruas" não encontrado.');
-        return;
-    }
+    // Função para preencher o select com as ruas
+    function preencherRuas() {
+        const urlParams = new URLSearchParams(window.location.search);
+        const param1 = urlParams.get('param1');
 
-    const urlParams = new URLSearchParams(window.location.search);
-    const param1 = urlParams.get('param1');
-
-    if (param1) {
         fetch(`/grafico/density-map/ruas?param1=${param1}`)
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error(`Erro na API: ${response.status} - ${response.statusText}`);
-                }
-                return response.json();
-            })
+            .then(response => response.json())
             .then(dados => {
-                if (!dados.ruas || !Array.isArray(dados.ruas)) {
-                    throw new Error('Resposta da API inesperada: "ruas" ausente ou não é uma lista.');
-                }
-
+                const select_ruas = document.getElementById('rua');
                 select_ruas.innerHTML = ''; // Limpa opções antigas
 
-                // Adiciona opções ao <select>
                 dados.ruas.forEach(item => {
                     const option = document.createElement('option');
                     option.value = item;
                     option.textContent = item;
                     select_ruas.appendChild(option);
                 });
-
-                // Torna o <select> visível se houver opções
-                if (dados.ruas.length > 0) {
-                    select_ruas.style.display = 'block';
-                }
             })
-            .catch(error => console.error('Erro ao buscar dados:', error));
-    } else {
-        console.warn('O parâmetro "param1" não foi encontrado na URL.');
+            .catch(error => console.error('Erro ao carregar ruas:', error));
     }
-});
 
+    // Função de atualização (caso você precise atualizar as ruas com novos parâmetros)
+    function atualizar_rua() {
+        preencherRuas();
+    }
 
+    // Chama a função de preenchimento quando a página carrega
+    document.addEventListener("DOMContentLoaded", function() {
+        preencherRuas();
+    });
 </script>
 
 {% endblock %}

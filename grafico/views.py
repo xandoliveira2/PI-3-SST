@@ -13,7 +13,13 @@ import numpy as np
 import os
 from django.conf import settings
 import requests
-from time import sleep
+from xhtml2pdf import pisa
+import matplotlib.pyplot as plt
+import io
+import base64
+
+
+
 def tudoNumerico(palavra:str):
     palavra = str(palavra)
     for i in palavra:
@@ -127,7 +133,7 @@ def aplicarCores(dataframe = df,ParametrosValores=[50,35,25,15]):
 
 
 df['rua'] = df['rua'].apply(obter_endereco_delay)
-print(df)
+
 df['data'] = pd.to_datetime(df['data'],format='%d/%m/%Y') 
 df['data'] = df['data'].dt.strftime('%d/%m/%Y') 
 df['size_column'] = df['total'].apply(lambda x: x if x != 0 else 0.1)
@@ -269,3 +275,148 @@ def login_view(request):
 
 def home(request):
     return render(request, 'home.html')
+
+
+
+def gerarPDF(request):
+    filtro_data = request.GET.get('param1')
+    filtro_veiculos = request.GET.get('param3', 'carros motos')
+    rua = request.GET.get('ruas')
+    filtro_veiculos = filtro_veiculos.split()
+    while '' in filtro_veiculos:
+        filtro_veiculos.remove('')
+    df_filtrado = df[(df['data'] == filtro_data) & (df['rua'] == rua)]
+    def gerar_grafico(dados):
+        periodos = dados['periodos']
+        carros = dados['carros']
+        motos = dados['motos']
+        total = [c + m for c, m in zip(carros, motos)]
+
+        plt.figure(figsize=(10, 6))
+        plt.plot(periodos, carros, marker='o', label='Carros', color='blue')
+        plt.plot(periodos, motos, marker='o', label='Motos', color='orange')
+        plt.plot(periodos, total, marker='o', label='Total', color='green', linestyle='--')
+        plt.title('Contagem de Veículos ao Longo do Tempo', fontsize=14)
+        plt.xlabel('Períodos', fontsize=12)
+        plt.ylabel('Quantidade', fontsize=12)
+        plt.legend()
+        plt.grid(True)
+
+        buffer = io.BytesIO()
+        plt.savefig(buffer, format='png', bbox_inches='tight')
+        buffer.seek(0)
+        grafico_base64 = base64.b64encode(buffer.getvalue()).decode('utf-8')
+        buffer.close()
+        plt.close()
+        return grafico_base64
+
+
+
+    caminho_logo = os.path.join(settings.BASE_DIR, 'static', 'pdf', 'logo.png')
+
+    with open(caminho_logo, 'rb') as logo_file:
+        logo_base64 = base64.b64encode(logo_file.read()).decode('utf-8')
+        
+        
+    # Gerar gráfico
+    df_filtrado['horario'] = pd.to_datetime(df_filtrado['horario'], format='%H:%M').dt.time
+    
+    df_filtrado.sort_values(by='horario', ascending=True , inplace=True)
+    df_filtrado['horario'] = df_filtrado['horario'].apply(lambda x: x.strftime('%H:%M'))
+    print(df_filtrado)
+    print(df_filtrado['horario'].tolist())
+    print(df_filtrado['carros'].tolist())
+    print(df_filtrado['motos'].tolist() )
+    dados_veiculos = {
+    'periodos': df_filtrado['horario'].tolist(),  # Converte a coluna 'horario' para uma lista
+      # Converte a coluna 'motos' para uma lista
+    }
+    for i in filtro_veiculos:
+        dados_veiculos.update({i:df_filtrado[i]})
+
+    grafico_base64 = gerar_grafico(dados_veiculos)
+
+    # Gerar conteúdo HTML com o gráfico
+    html_content = f"""
+    <!DOCTYPE html>
+    <html lang="pt-BR">
+    <head>
+        <meta charset="UTF-8">
+        <title>Relatório de Contagem de Veículos</title>
+        <style>
+            body {{
+                font-family: 'Arial', sans-serif;
+                margin: 20px;
+                color: #333;
+            }}
+            header {{
+                text-align: center;
+                margin-bottom: 20px;
+            }}
+            header img {{
+                width: 150px;
+            }}
+            h1 {{
+                text-align: center;
+                color: #4CAF50;
+            }}
+            h2 {{
+                color: #333;
+                margin-top: 20px;
+            }}
+            p {{
+                font-size: 14px;
+                line-height: 1.6;
+            }}
+            ul {{
+                font-size: 14px;
+                line-height: 1.6;
+                margin-left: 20px;
+            }}
+            li {{
+                margin-bottom: 5px;
+            }}
+            img {{
+                display: block;
+                margin: 20px auto;
+                max-width: 100%;
+                height: auto;
+            }}
+            footer {{
+                text-align: center;
+                margin-top: 20px;
+                font-size: 12px;
+                color: #666;
+            }}
+        </style>
+    </head>
+    <body>
+        <header>
+            <img src="data:image/png;base64,{logo_base64}" alt="Gráfico de Contagem de Veículos">
+        </header>
+        <h1>Relatório de Contagem de Veículos</h1>
+        <p>Este relatório apresenta a contagem de veículos ao longo do tempo, com destaque para carros, motos e o total de veículos.</p>
+        <h2>{rua}<h2>
+        <ul>
+            <li><strong>Total de Carros:</strong> {sum(dados_veiculos['carros'])}</li>
+            <li><strong>Total de Motos:</strong> {sum(dados_veiculos['motos'])}</li>
+            <li><strong>Total Geral:</strong> {sum(dados_veiculos['carros']) + sum(dados_veiculos['motos'])}</li>
+        </ul>
+        <img src="data:image/png;base64,{grafico_base64}" alt="Gráfico de Contagem de Veículos">
+    </body>
+    </html>
+    """
+
+    # Gerar o PDF a partir do conteúdo HTML
+    pdf_output = io.BytesIO()
+    pisa_status = pisa.CreatePDF(html_content, dest=pdf_output)
+
+    if pisa_status.err:
+        return HttpResponse("Erro ao gerar o PDF.", status=500)
+
+    # Retornar o PDF gerado como resposta para o download
+    pdf_output.seek(0)  # Voltar ao início do arquivo em memória
+    response = HttpResponse(pdf_output, content_type='application/pdf')
+    response['Content-Disposition'] = 'attachment; filename="relatorio_veiculos.pdf"'
+
+    return response

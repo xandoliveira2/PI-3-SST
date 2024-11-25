@@ -443,7 +443,59 @@ window.location.href = url;
         });
     })}
  </script>
+    <script>
 
+
+
+
+      document.addEventListener("DOMContentLoaded", ()=> {
+     new MultiSelectTag('ruas', {
+        rounded: true,    // default true
+        shadow: false,      // default false
+        placeholder: 'Search',  // default Search...
+        tagColor: {
+            textColor: '#327b2c',
+            borderColor: '#92e681',
+            bgColor: '#eaffe6',
+        },
+        onChange: function(values) {
+            console.log(values)
+        }
+    })
+  
+    const selectElement = document.getElementById('data_form');
+  if (!selectElement) {
+    console.error('Elemento com id "data_form" não encontrado.');
+    return;
+  }
+
+  const urlParams = new URLSearchParams(window.location.search);
+  const paramData = urlParams.get('param1');
+
+  if (paramData) {
+    // Verifica se a opção já existe no select
+    let optionExists = false;
+    for (const option of selectElement.options) {
+      if (option.value === paramData) {
+        optionExists = true;
+        break;
+      }
+    }
+
+    // Adiciona a opção ao select se não existir
+    if (!optionExists) {
+      const newOption = document.createElement('option');
+      newOption.value = paramData;
+      newOption.textContent = paramData; // Texto visível no select
+      selectElement.appendChild(newOption);
+    }
+
+    // Define o valor do select
+    selectElement.value = paramData;
+  }
+
+  })
+    </script>
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
 

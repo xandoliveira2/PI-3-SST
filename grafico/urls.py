@@ -1,5 +1,5 @@
 from django.urls import path
-from .views import density_map_view,enviar_coluna_data,recebe_data,enviar_coluna_horarios,pagRelatorio,enviar_coluna_rua,home#,update_map
+from .views import density_map_view,enviar_coluna_data,recebe_data,enviar_coluna_horarios,pagRelatorio,enviar_coluna_rua,home,gerarPDF#,update_map
 
 app_name = 'grafico'  # Define o namespace do app
 
@@ -13,6 +13,7 @@ urlpatterns = [
     path('relatorio/',pagRelatorio,name='pagRelatorio'),
     path('density-map/ruas',enviar_coluna_rua,name='enviarColunaRua'),
     path('home/',home,name='home'),
+    path('relatorio/pdf',gerarPDF,name='gerarPDF')
 
     
     # path('login/',login_view, name='login')  # Rota para login

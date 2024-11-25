@@ -1,7 +1,7 @@
+{% extends 'base.html' %}
 {% load static %}
+{% block 'home' %}
 
-<!DOCTYPE html>
-<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -13,13 +13,7 @@
         body{
             background-color: #000B58;
         }
-        nav{
-            height: 80px;
-            display: flex;
-            flex-direction: row-reverse;
-            padding: 10px;
-        }
-
+       
         a{
             color: aliceblue;
         }
@@ -60,10 +54,7 @@
     </style>
 </head>
 <body>
-    <nav>
-        <a href="/"><p>Sair</p></a>
 
-    </nav>
    <i><h1>AutoFlow</h1></i> 
     <h2>Sistema de Monitoramento de Tráfego</h2>
 
@@ -72,5 +63,4 @@
         <a href="/grafico/relatorio/"><button class="botao">Gerar Relatorio</button></a>
     </div>
 
-</body>
-</html>
+{% endblock %}
