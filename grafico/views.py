@@ -280,11 +280,10 @@ def home(request):
 
 def gerarPDF(request):
     filtro_data = request.GET.get('param1')
-    filtro_veiculos = request.GET.get('param3', 'carros motos')
+    
     rua = request.GET.get('ruas')
-    filtro_veiculos = filtro_veiculos.split()
-    while '' in filtro_veiculos:
-        filtro_veiculos.remove('')
+    
+    
     df_filtrado = df[(df['data'] == filtro_data) & (df['rua'] == rua)]
     def gerar_grafico(dados):
         periodos = dados['periodos']
@@ -329,10 +328,9 @@ def gerarPDF(request):
     print(df_filtrado['motos'].tolist() )
     dados_veiculos = {
     'periodos': df_filtrado['horario'].tolist(),  # Converte a coluna 'horario' para uma lista
-      # Converte a coluna 'motos' para uma lista
+    'carros': df_filtrado['carros'].tolist(),    # Converte a coluna 'carros' para uma lista
+    'motos': df_filtrado['motos'].tolist()       # Converte a coluna 'motos' para uma lista
     }
-    for i in filtro_veiculos:
-        dados_veiculos.update({i:df_filtrado[i]})
 
     grafico_base64 = gerar_grafico(dados_veiculos)
 

@@ -147,13 +147,13 @@ carregarOpcoes();
     </script>
 <script> function atualizarMapaComParametros(){
     
-    if (!document.getElementById("carros").checked &&
-    !document.getElementById("motos").checked&&
-    !document.getElementById("vans").checked &&
-    !document.getElementById("caminhoes").checked &&
-    !document.getElementById("onibus").checked){
-        alert("Selecione ao menos 1 tipo de veículo")
-    }  else {
+    // if (!document.getElementById("carros").checked &&
+    // !document.getElementById("motos").checked&&
+    // !document.getElementById("vans").checked &&
+    // !document.getElementById("caminhoes").checked &&
+    // !document.getElementById("onibus").checked){
+    //     alert("Selecione ao menos 1 tipo de veículo")
+    // }  else {
 
         
     const data = document.getElementById('data_form').value;
@@ -187,7 +187,8 @@ else{
 const url = `http://localhost:8000/grafico/relatorio/pdf?param1=${data}&param3=${filtros}&ruas=${elemento}`;
 window.location.href = url;
 }
-    }}
+    }
+//}
 
 </script>
 
@@ -208,11 +209,11 @@ window.location.href = url;
 <fieldset>
     <legend>Veículos</legend>
     <div class="wrapper v">
-      <input type="checkbox" name="carros" id="carros">
+      <input type="checkbox" name="carros" id="carros" disabled>
       <p>Carros</p>
     </div>
     <div class="wrapper v">
-      <input type="checkbox" name="motos" id="motos">
+      <input type="checkbox" name="motos" id="motos" disabled>
       <p>Motos</p>
     </div>
     <div class="wrapper v">
