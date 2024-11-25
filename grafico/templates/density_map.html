@@ -659,7 +659,15 @@ window.location.href = url;
         console.log(urlDestino)
         
         
-        window.location.href = urlDestino
+       if(document.getElementById('vermelho').value > document.getElementById('laranja').value && 
+          document.getElementById('laranja').value > document.getElementById('amarelo').value && 
+          document.getElementById('amarelo').value > document.getElementById('azul').value){
+
+          window.location.href = urlDestino;
+        }
+        else{
+          alert("Mantenha a ordem Vermelho > Laranja > Amarelo > Azul")
+        }
      }else{
         alert("Preencha todos os campos")
      }
