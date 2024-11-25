@@ -31,11 +31,11 @@ def obter_endereco_por_cep(cep):
     try:
         if tudoNumerico(cep):
             url = f"https://viacep.com.br/ws/{cep}/json/"
-            resposta = requests.get(url,timeout=0.1)
+            resposta = requests.get(url,timeout=1)
         elif '-' in cep:
             cep = cep.replace("-", "")
             url = f"https://viacep.com.br/ws/{cep}/json/"
-            resposta = requests.get(url,timeout=0.1)
+            resposta = requests.get(url,timeout=1)
         else:
             return cep
         if resposta.status_code == 200:
@@ -53,7 +53,7 @@ def obter_endereco_por_cep(cep):
             cep_int = int(cep)  # strip() para remover espaços em branco
             dicionario = {
                 13974503: "Avenida Castro Alves",
-                13974080: "Tereza Lera Paoletti",
+                13974080: "Rua Tereza Lera Paoletti",
             }
             print(cep_int,'  < --cep int')
             return dicionario.get(cep_int,'CEP não encontrado no bd')
